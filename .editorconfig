@@ -1,0 +1,4 @@
+﻿[*.cs]
+
+# CA1050: Declarar tipos en espacios de nombres
+dotnet_diagnostic.CA1050.severity = suggestion
