@@ -54,7 +54,8 @@ public class Parser
         Expression? exp = ParseNumber();
         if (exp != null) return exp;
 
-      //  exp = 
+        exp = ParseParentesis();
+        if (exp != null) return exp;
 
         return null;
     }
@@ -151,20 +152,25 @@ public class Parser
 
         //    return new Number(double.Parse(Stream.CurrentToken().StringToken), Stream.Position);
     }
-    //private Expression? ParseParentesis()
-    //{
-    //    if (Stream.IsToken(TiposDToken.OpenParentesis))
-    //    {
-    //        Stream.NextToken();
-    //        return ParseExpression();
-    //    }
-    //    if (Stream.IsToken(TiposDToken.OpResta) && Stream.FindToken(TiposDToken.OpenParentesis))
-    //    {
-    //        return new Number(-1 * double.Parse(Stream.CurrentToken().StringToken), Stream.Position);
+    private Expression? ParseParentesis()
+    {
+        if (Stream.IsToken(TiposDToken.OpenParentesis))
+        {
+            var exp = new Parentesis(Stream.Position);
+            Stream.NextToken();
+            exp.InsideParentesis = ParseExpression();
+            return exp;
+        }
+        if (Stream.IsToken(TiposDToken.OpResta) && Stream.FindToken(TiposDToken.OpenParentesis))
+        {
+            var exp = new Parentesis(Stream.Position);
+            Stream.NextToken();
+            exp.InsideParentesis = ParseExpression();
+            return exp.NegateParentesis();
 
-    //    }
-    //    return null;
-    //}
+        }
+        return null;
+    }
 
 
 }

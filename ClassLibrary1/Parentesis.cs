@@ -6,14 +6,31 @@ using System.Threading.Tasks;
 
 namespace ClassLibrary1
 {
-     class Parentesis : AtomExpression
+    class Parentesis : AtomExpression
     {
-        public Parentesis(double value, int Location) : base(Location)
+        public Parentesis(int Location) : base(Location)
         {
-            Value = value;
+            //var parser = new Parser(stream);
+            //var exp = parser.ParseExpression();
+            // exp.Evaluate();
+            // exp.Value;
         }
         public override ExpressionType Type { get; set; }
 
         public override object? Value { get; set; }
+        public Expression? InsideParentesis { get; set; }
+
+        public override void Evaluate()
+        {
+            InsideParentesis!.Evaluate();
+
+            Value = (double)InsideParentesis.Value!;
+        }
+        public Expression? NegateParentesis()
+        {
+            InsideParentesis.Evaluate();
+            double x = (double)InsideParentesis.Value!;
+            return new Number(-1*x,Location);
+        }
     }
 }

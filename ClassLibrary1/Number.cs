@@ -1,7 +1,7 @@
 
 public class Number : AtomExpression
 {
-    public Number(double value, int Location) : base(Location)
+    public Number(double? value, int Location) : base(Location)
     {
         Value = value;
     }
