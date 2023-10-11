@@ -32,5 +32,75 @@ namespace ClassLibrary1
         }
     }
 
+    //public class NumberPI : AtomExpression
+    //{
+    //    public NumberPI (int Location) : base(Location) { }
 
+    //    public override object? Value { get { return Math.PI; } set { } }
+
+    //    public override ExpressionType Type
+    //    {
+    //        get { return ExpressionType.Number; }
+    //        set { }
+    //    }
+    //}
+
+    public class Coseno : AtomExpression
+    {
+        public Coseno(int Location) : base(Location) { }
+
+        public override object? Value { get; set; }
+        public Expression? InsideParentesis { get; set; }
+
+        public override ExpressionType Type
+        {
+            get
+            {
+                return ExpressionType.Number;
+            }
+            set { }
+        }
+
+        public override void Evaluate()
+        {
+            InsideParentesis!.Evaluate();
+
+            Value =Math.Cos( (double)InsideParentesis.Value!);
+        }
+        public Expression? NegateCos()
+        {
+            Evaluate();
+            double x = (double)Value!;
+            return new Number(-1 * x, Location);
+        }
+    }
+    public class Seno : AtomExpression
+    {
+        public Seno(int Location) : base(Location) { }
+
+        public override object? Value { get; set; }
+        public Expression? InsideParentesis { get; set; }
+
+        public override ExpressionType Type
+        {
+            get
+            {
+                return ExpressionType.Number;
+            }
+            set { }
+        }
+
+        public override void Evaluate()
+        {
+            InsideParentesis!.Evaluate();
+
+            Value = Math.Sin((double)InsideParentesis.Value!);
+        }
+        public Expression? NegateSen()
+        {
+            Evaluate();
+            double x = (double)Value!;
+            return new Number(-1 * x, Location);
+        }
+    }
 }

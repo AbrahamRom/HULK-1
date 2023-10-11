@@ -52,10 +52,30 @@ public class Parser
 
         return left;
     }
-
     private Expression? ParseExpressionLv3()
     {
+        Expression? newLeft = ParseExpressionLv4();
+        return ParseExpressionLv3_(newLeft);
+    }
+    private Expression? ParseExpressionLv3_(Expression? left)
+    {
+        Expression? exp = ParsePotencia(left);
+        if (exp != null) return exp;
+        return left;
+    }
+
+    private Expression? ParseExpressionLv4()
+    {
         Expression? exp = ParseNumber();
+        if (exp != null) return exp;
+
+        exp = ParsePI();
+        if (exp != null) return exp;
+
+        exp = ParseCoseno();
+        if (exp != null) return exp;
+
+        exp = ParseSeno();
         if (exp != null) return exp;
 
         exp = ParseParentesis();
@@ -139,6 +159,22 @@ public class Parser
 
         return ParseExpressionLv2_(div);
     }
+    private Expression? ParsePotencia(Expression? left)
+    {
+        Potencia pot = new Potencia(Stream.Position);
+        if (left == null || !Stream.FindToken(TiposDToken.Potencia)) return null;
+        pot.Left = left;
+        Stream.NextToken();
+        Expression? right = ParseExpressionLv4();
+        if (right == null)
+        {
+            Stream.MoveBack(2);
+            return null;
+        }
+        pot.Right = right;
+
+        return ParseExpressionLv3_(pot);
+    }
 
     private Expression? ParseNumber()
     {
@@ -179,5 +215,73 @@ public class Parser
         return null;
     }
 
+    private Expression? ParseCoseno()
+    {
+        if (Stream.IsToken(TiposDToken.Coseno))
+        {
+           if (Stream.FindToken(TiposDToken.OpenParentesis))
+            {
+                var exp = new Coseno(Stream.Position);
+                Stream.NextToken();
+                exp.InsideParentesis = ParseExpression();
+                return exp;
+            }
+            Stream.NextToken();
+            return null;
+        }
+        if (Stream.IsToken(TiposDToken.OpResta) && Stream.FindToken(TiposDToken.Coseno))
+        {
+            if (Stream.FindToken(TiposDToken.OpenParentesis))
+            {
+                var exp = new Coseno(Stream.Position);
+                Stream.NextToken();
+                exp.InsideParentesis = ParseExpression();
+                return exp.NegateCos();
+            }
+            Stream.NextToken();
+            return null;
+        }
+        return null;
+    }
+    private Expression? ParseSeno()
+    {
+        if (Stream.IsToken(TiposDToken.Seno))
+        {
+            if (Stream.FindToken(TiposDToken.OpenParentesis))
+            {
+                var exp = new Seno(Stream.Position);
+                Stream.NextToken();
+                exp.InsideParentesis = ParseExpression();
+                return exp;
+            }
+            Stream.NextToken();
+            return null;
+        }
+        if (Stream.IsToken(TiposDToken.OpResta) && Stream.FindToken(TiposDToken.Seno))
+        {
+            if (Stream.FindToken(TiposDToken.OpenParentesis))
+            {
+                var exp = new Seno(Stream.Position);
+                Stream.NextToken();
+                exp.InsideParentesis = ParseExpression();
+                return exp.NegateSen();
+            }
+            Stream.NextToken();
+            return null;
+        }
+        return null;
+    }
 
+    private Expression? ParsePI()
+    {
+        if (Stream.IsToken(TiposDToken.NumberPI))
+        {
+            return new Number( Math.PI, Stream.Position - 1);
+        }
+        if (Stream.IsToken(TiposDToken.OpResta) && Stream.FindToken((TiposDToken.NumberPI)))
+        {
+            return new Number(-1 * Math.PI, Stream.Position - 1);
+        }
+        return null;
+    }
 }
