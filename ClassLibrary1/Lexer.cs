@@ -37,7 +37,7 @@ namespace ClassLibrary1
             }
         }
     }
-    public enum TiposDToken { OpSuma, OpResta, OpMultiply, OpDivide, OpenParentesis, CloseParentesis, PuntoComa, Number, InvalidToken }
+    public enum TiposDToken { OpSuma, OpResta, OpMultiply, OpDivide, OpenParentesis, CloseParentesis, PuntoComa, Number, Potencia, NumberPI, Seno, Coseno, Logaritmo, InvalidToken }
     public class Token
     {
         public TiposDToken TipoDToken;
@@ -52,6 +52,11 @@ namespace ClassLibrary1
             else if (ExpresionesRegulares.OpResta.IsMatch(stringtoken)) this.TipoDToken = TiposDToken.OpResta;
             else if (ExpresionesRegulares.OpMultiply.IsMatch(stringtoken)) this.TipoDToken = TiposDToken.OpMultiply;
             else if (ExpresionesRegulares.OpDivide.IsMatch(stringtoken)) this.TipoDToken = TiposDToken.OpDivide;
+            else if (ExpresionesRegulares.Potencia.IsMatch(stringtoken)) this.TipoDToken = TiposDToken.Potencia;
+            else if (ExpresionesRegulares.NumberPI.IsMatch(stringtoken)) this.TipoDToken = TiposDToken.NumberPI;
+            else if (ExpresionesRegulares.Seno.IsMatch(stringtoken)) this.TipoDToken = TiposDToken.Seno;
+            else if (ExpresionesRegulares.Coseno.IsMatch(stringtoken)) this.TipoDToken = TiposDToken.Coseno;
+            else if (ExpresionesRegulares.Logaritmo.IsMatch(stringtoken)) this.TipoDToken = TiposDToken.Logaritmo;
             else if (ExpresionesRegulares.OpenParentesis.IsMatch(stringtoken)) this.TipoDToken = TiposDToken.OpenParentesis;
             else if (ExpresionesRegulares.CloseParentesis.IsMatch(stringtoken)) this.TipoDToken = TiposDToken.CloseParentesis;
             else if (ExpresionesRegulares.PuntoComa.IsMatch(stringtoken)) this.TipoDToken = TiposDToken.PuntoComa;
