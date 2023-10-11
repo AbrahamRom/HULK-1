@@ -65,7 +65,7 @@ namespace ClassLibrary1
         {
             InsideParentesis!.Evaluate();
 
-            Value =Math.Cos( (double)InsideParentesis.Value!);
+            Value = Math.Cos((double)InsideParentesis.Value!);
         }
         public Expression? NegateCos()
         {
@@ -103,4 +103,32 @@ namespace ClassLibrary1
             return new Number(-1 * x, Location);
         }
     }
+
+    public class Logaritmo : BinaryExpression
+    {
+        public Logaritmo(int Location) : base(Location) { }
+
+        public override ExpressionType Type { get; set; }
+
+        public override object? Value { get; set; }
+
+        public override void Evaluate()
+        {
+            Right!.Evaluate();
+            Left!.Evaluate();
+
+            Value = Math.Log((double)Left.Value!, (double)Right.Value!);
+        }
+
+        public override string? ToString()
+        {
+            if (Value == null)
+            {
+                return String.Format("(log({0},{1}))", Left, Right);
+            }
+            return Value.ToString();
+        }
+
+    }
+
 }

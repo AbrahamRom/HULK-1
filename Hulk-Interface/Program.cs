@@ -7,7 +7,7 @@ namespace Hulk_Interface
         {
             while (true)
             {
-             Console.Write(">");
+             Console.Write(">");              
                 string code = Console.ReadLine();
                 if (string.IsNullOrWhiteSpace(code)) return;
                 var errors = new List<CompilingError>();

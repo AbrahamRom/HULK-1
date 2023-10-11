@@ -21,7 +21,7 @@ public class Parser
         if (Stream.FindToken(TiposDToken.CloseParentesis))
         {
             exp = ParseExpressionLv1_(exp);
-        }            
+        }
         return exp;
     }
 
@@ -76,6 +76,9 @@ public class Parser
         if (exp != null) return exp;
 
         exp = ParseSeno();
+        if (exp != null) return exp;
+
+        exp = ParseLog();
         if (exp != null) return exp;
 
         exp = ParseParentesis();
@@ -219,7 +222,7 @@ public class Parser
     {
         if (Stream.IsToken(TiposDToken.Coseno))
         {
-           if (Stream.FindToken(TiposDToken.OpenParentesis))
+            if (Stream.FindToken(TiposDToken.OpenParentesis))
             {
                 var exp = new Coseno(Stream.Position);
                 Stream.NextToken();
@@ -276,11 +279,41 @@ public class Parser
     {
         if (Stream.IsToken(TiposDToken.NumberPI))
         {
-            return new Number( Math.PI, Stream.Position - 1);
+            return new Number(Math.PI, Stream.Position - 1);
         }
         if (Stream.IsToken(TiposDToken.OpResta) && Stream.FindToken((TiposDToken.NumberPI)))
         {
             return new Number(-1 * Math.PI, Stream.Position - 1);
+        }
+        return null;
+    }
+
+    private Expression? ParseLog()
+    {
+        if (Stream.IsToken(TiposDToken.Logaritmo))
+        {
+            var exp = new Logaritmo(Stream.Position);
+            if (Stream.FindToken(TiposDToken.OpenParentesis))
+            {
+                Stream.NextToken();
+                var left = ParseExpression();
+                left.Evaluate();
+                double x = (double)left.Value!;
+                bool BaseValida = left != null && x > 0 && x != 1;
+                if (!BaseValida || !Stream.FindToken(TiposDToken.Coma)) return null;
+                Stream.NextToken();
+                var right = ParseExpression();
+                if (right == null) return null;
+                right.Evaluate();
+                double y = (double)right.Value!;
+                if (y <= 0) return null;
+                exp.Left = left;
+                exp.Right = right;
+                return exp;
+
+            }
+            Stream.NextToken();
+            return null;
         }
         return null;
     }
