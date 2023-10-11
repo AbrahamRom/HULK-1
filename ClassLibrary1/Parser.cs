@@ -18,6 +18,10 @@ public class Parser
     {
         Expression? newLeft = ParseExpressionLv2();
         Expression? exp = ParseExpressionLv1_(newLeft);
+        if (Stream.FindToken(TiposDToken.CloseParentesis))
+        {
+            exp = ParseExpressionLv1_(exp);
+        }            
         return exp;
     }
 
@@ -66,7 +70,7 @@ public class Parser
 
         if (left == null || !Stream.FindToken(TiposDToken.OpSuma)) return null;
 
-                 sum.Left = left;
+        sum.Left = left;
         Stream.NextToken();
         Expression? right = ParseExpressionLv2();
         if (right == null)
@@ -81,11 +85,11 @@ public class Parser
 
     private Expression? ParseSub(Expression? left)
     {
-                Sub sub = new Sub(Stream.Position);
+        Sub sub = new Sub(Stream.Position);
 
         if (left == null || !Stream.FindToken(TiposDToken.OpResta)) return null;
 
-                 sub.Left = left;
+        sub.Left = left;
         Stream.NextToken();
         Expression? right = ParseExpressionLv2();
         if (right == null)
@@ -144,7 +148,7 @@ public class Parser
         }
         if (Stream.IsToken(TiposDToken.OpResta) && Stream.FindToken(TiposDToken.Number))
         {
-            return new Number(-1*double.Parse(Stream.CurrentToken().StringToken), Stream.Position-1);
+            return new Number(-1 * double.Parse(Stream.CurrentToken().StringToken), Stream.Position - 1);
 
         }
         return null;
@@ -157,8 +161,11 @@ public class Parser
         if (Stream.IsToken(TiposDToken.OpenParentesis))
         {
             var exp = new Parentesis(Stream.Position);
+
+            Stream.LastToken = Stream.WhereCloseParentesis();
             Stream.NextToken();
             exp.InsideParentesis = ParseExpression();
+            Stream.LastToken = Stream.tokens.Length - 1;
             return exp;
         }
         if (Stream.IsToken(TiposDToken.OpResta) && Stream.FindToken(TiposDToken.OpenParentesis))

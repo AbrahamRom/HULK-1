@@ -66,6 +66,11 @@ namespace ClassLibrary1
         static public Regex OpResta = new Regex(@"\-");
         static public Regex OpMultiply = new Regex(@"\*");
         static public Regex OpDivide = new Regex(@"/");
+        static public Regex Potencia = new Regex(@"\^");
+        static public Regex NumberPI = new Regex("PI");
+        static public Regex Seno = new Regex("sin");
+        static public Regex Coseno = new Regex("cos");
+        static public Regex Logaritmo = new Regex("log");
         static public Regex OpenParentesis = new Regex(@"\(");
         static public Regex CloseParentesis = new Regex(@"\)");
         static public Regex PuntoComa = new Regex(";");

@@ -2,14 +2,15 @@ using System.Collections;
 using ClassLibrary1;
 public class TokenStream
 {
-    Token[] tokens;
+    public Token[] tokens;
     int position;
-    int LastToken => tokens.Length - 1;
+    public int LastToken { get; set; }
 
     public TokenStream(Token[] token)
     {
         this.tokens = token;
         position = 0;
+        LastToken = token.Length - 1;
     }
     public int Position { get { return position; } }
     public bool IsToken(TiposDToken type)
@@ -18,7 +19,7 @@ public class TokenStream
     }
     public Token CurrentToken()
     {
-         return tokens[position];
+        return tokens[position];
     }
     public void NextToken(int k = 1)
     {
@@ -26,7 +27,7 @@ public class TokenStream
     }
     public bool FindToken(TiposDToken type)
     {
-        if (position < LastToken && tokens[position+1].TipoDToken == type)
+        if (position < LastToken && tokens[position + 1].TipoDToken == type)
         {
             NextToken();
             return true;
@@ -37,6 +38,18 @@ public class TokenStream
     public void MoveBack(int k)
     {
         position -= k;
+    }
+    public int WhereCloseParentesis()
+    {
+        int count = 1;
+        int k = Position;
+        while (count != 0 && k < tokens.Length - 1)
+        {
+            k++;
+            if (tokens[k].TipoDToken == TiposDToken.OpenParentesis) count++;
+            if (tokens[k].TipoDToken == TiposDToken.CloseParentesis) count--;
+        }
+        return k;
     }
 
     // public bool Next()
