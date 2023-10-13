@@ -131,4 +131,33 @@ namespace ClassLibrary1
 
     }
 
+    public class VariableReference : AtomExpression
+    {
+        public VariableReference(string identifier,VariableScope variables,int Location) : base(Location)
+        {
+            this.Identifier = identifier;
+            VariableScope = variables;
+        }
+        public string Identifier { get; set; }
+
+       public override ExpressionType Type { get; set; }
+        public VariableScope VariableScope { get; set; }
+
+        public override object Value
+        {
+            get
+            {
+                if (VariableScope.ContainsVariable(Identifier))
+                {
+                    return VariableScope.GetVariableValue(Identifier);
+                }
+                else
+                {
+                    throw new Exception($"Semantic error: Variable '{Identifier}' does not exist.");
+                }
+            }
+            set { }
+        }
+
+    }
 }

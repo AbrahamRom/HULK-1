@@ -29,10 +29,11 @@ namespace Hulk_Interface
 
                 var Stream = new TokenStream(TokenizedCode);
                 var Parser = new Parser(Stream);
-                var x = Parser.ParseExpression();
-                x.Evaluate();
-                Console.WriteLine(x.Value);
-
+                //var x = Parser.ParseExpression();
+                //x.Evaluate();
+                //Console.WriteLine(x.Value);
+                var Statement = Parser.ParseStament();
+                Statement.Execute();
 
             }
         }

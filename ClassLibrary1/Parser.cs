@@ -4,11 +4,56 @@ public class Parser
     public Parser(TokenStream stream)
     {
         Stream = stream;
+        DefVariables = new VariableScope();
     }
 
     public TokenStream Stream { get; private set; }
 
+    public  VariableScope DefVariables { get; private set; }
 
+    public StatementNode? ParseStament()
+    {
+        StatementNode? Statement = ParsePrint();
+        if (Statement != null) return Statement;
+
+        ParseParseVariableDeclaration();
+        if (Stream.FindToken(TiposDToken.In))
+        {
+            Stream.NextToken();
+            Statement = ParseStament();
+            if (Statement != null) return Statement;
+        }
+
+        return null;
+    }
+    private StatementNode? ParsePrint()
+    {
+        if (!Stream.IsToken(TiposDToken.Print)) return null;
+        if (!Stream.FindToken(TiposDToken.OpenParentesis)) return null;
+        Stream.NextToken();
+        var exp = ParseExpression();
+        var Statement = new PrintStatementNode(Stream.Position - 2, exp);
+        return Statement;
+    }
+    private void ParseParseVariableDeclaration()
+    {
+        if (!Stream.IsToken(TiposDToken.Let)) return;
+        int count = 1;
+        while (count == 1)
+        { // revisar si se declaran 2 variables con el mismo nombre
+            if (!Stream.FindToken(TiposDToken.Identificador)) return;
+            if (!Stream.FindToken(TiposDToken.Assign)) return;
+            Stream.MoveBack(1);
+            string variable = Stream.CurrentToken().StringToken;
+            int location = Stream.Position;
+            Stream.NextToken(2);
+            var exp = ParseExpression();
+            var DeclVar = new VariableDeclarationNode(variable, exp, DefVariables,location);
+            DeclVar.Execute();
+            if (!Stream.FindToken(TiposDToken.Coma)) count = 0;
+            
+        }
+    }
     public Expression? ParseExpression()
     {
         return ParseExpressionLv1();
@@ -70,6 +115,9 @@ public class Parser
         if (exp != null) return exp;
 
         exp = ParsePI();
+        if (exp != null) return exp;
+
+        exp = ParseVariableReference();
         if (exp != null) return exp;
 
         exp = ParseCoseno();
@@ -317,4 +365,89 @@ public class Parser
         }
         return null;
     }
+
+    private Expression? ParseVariableReference()
+    {
+        if (Stream.IsToken(TiposDToken.Identificador))
+        {
+            return new VariableReference(Stream.CurrentToken().StringToken, DefVariables,Stream.Position);
+        }
+        return null;
+    }
+
 }
+
+
+public class VariableScope
+{
+    public  Dictionary<string, object> variables = new Dictionary<string, object>();
+
+    public void AddVariable(string identifier, object value)
+    {
+        variables.Add(identifier, value);
+    }
+
+    public void AssignVariable(string identifier, object value)
+    {
+        variables[identifier] = value;
+    }
+
+    public void ClearVariables()
+    {
+        variables.Clear();
+    }
+
+    public object GetVariableValue(string identifier)
+    {
+        if (variables.ContainsKey(identifier))
+        {
+            return variables[identifier];
+        }
+        else
+        {
+            throw new Exception($"Semantic error: Variable '{identifier}' does not exist.");///ver
+        }
+    }
+
+    public bool ContainsVariable(string identifier)
+    {
+        return variables.ContainsKey(identifier);
+    }
+}
+
+//public static class VariableScope
+//{
+//    private static Dictionary<string, object> variables = new Dictionary<string, object>();
+
+//    public static void AddVariable(string identifier, object value)
+//    {
+//        variables.Add(identifier, value);
+//    }
+
+//    public static void AssignVariable(string identifier, object value)
+//    {
+//        variables[identifier] = value;
+//    }
+
+//    public static void ClearVariables()
+//    {
+//        variables.Clear();
+//    }
+
+//    public static object GetVariableValue(string identifier)
+//    {
+//        if (variables.ContainsKey(identifier))
+//        {
+//            return variables[identifier];
+//        }
+//        else
+//        {
+//            throw new Exception($"Semantic error: Variable '{identifier}' does not exist.");///ver
+//        }
+//    }
+
+//    public static bool ContainsVariable(string identifier)
+//    {
+//        return variables.ContainsKey(identifier);
+//    }
+//}

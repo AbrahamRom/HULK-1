@@ -9,7 +9,7 @@ namespace ClassLibrary1
 {
     public class Lexer
     {
-        static string TokenUnion = ExpresionesRegulares.OpSuma.ToString() + "|" + ExpresionesRegulares.OpResta.ToString() + "|" + ExpresionesRegulares.OpMultiply.ToString() + "|" + ExpresionesRegulares.OpDivide.ToString() + "|" + ExpresionesRegulares.Potencia.ToString() + "|" + ExpresionesRegulares.NumberPI.ToString() + "|" + ExpresionesRegulares.Seno.ToString() + "|" + ExpresionesRegulares.Coseno.ToString() + "|" + ExpresionesRegulares.Logaritmo.ToString() + "|" + ExpresionesRegulares.OpenParentesis.ToString() + "|" + ExpresionesRegulares.CloseParentesis.ToString() + "|" + ExpresionesRegulares.Coma.ToString() + "|" + ExpresionesRegulares.PuntoComa.ToString() + "|" + ExpresionesRegulares.numero.ToString();
+        static string TokenUnion = ExpresionesRegulares.OpSuma.ToString() + "|" + ExpresionesRegulares.OpResta.ToString() + "|" + ExpresionesRegulares.OpMultiply.ToString() + "|" + ExpresionesRegulares.OpDivide.ToString() + "|" + ExpresionesRegulares.Potencia.ToString() + "|" + ExpresionesRegulares.NumberPI.ToString() + "|" + ExpresionesRegulares.Seno.ToString() + "|" + ExpresionesRegulares.Coseno.ToString() + "|" + ExpresionesRegulares.Logaritmo.ToString() + "|" + ExpresionesRegulares.OpenParentesis.ToString() + "|" + ExpresionesRegulares.CloseParentesis.ToString() + "|" + ExpresionesRegulares.Coma.ToString() + "|" + ExpresionesRegulares.PuntoComa.ToString() + "|" + ExpresionesRegulares.numero.ToString()+"|" + ExpresionesRegulares.Print.ToString() + "|" + ExpresionesRegulares.Let.ToString() + "|" + ExpresionesRegulares.In.ToString() + "|" + ExpresionesRegulares.Assign.ToString() + "|" + ExpresionesRegulares.Identificador.ToString();
         static Regex separador = new Regex(TokenUnion); // el regex que se usa para separar los tokens // se lleva los errores de errores invalidos ARREGLAR
 
         public Token[] ArrayObjectToken;
@@ -37,7 +37,7 @@ namespace ClassLibrary1
             }
         }
     }
-    public enum TiposDToken { OpSuma, OpResta, OpMultiply, OpDivide, OpenParentesis, CloseParentesis, PuntoComa, Number, Potencia, NumberPI, Seno, Coseno, Logaritmo,Coma, InvalidToken }
+    public enum TiposDToken { OpSuma, OpResta, OpMultiply, OpDivide, OpenParentesis, CloseParentesis, PuntoComa, Number, Potencia, NumberPI, Seno, Coseno, Logaritmo,Coma, Print,Identificador,Let,In,Assign,InvalidToken }
     public class Token
     {
         public TiposDToken TipoDToken;
@@ -62,6 +62,11 @@ namespace ClassLibrary1
             else if (ExpresionesRegulares.Coma.IsMatch(stringtoken)) this.TipoDToken = TiposDToken.Coma;
             else if (ExpresionesRegulares.PuntoComa.IsMatch(stringtoken)) this.TipoDToken = TiposDToken.PuntoComa;
             else if (ExpresionesRegulares.numero.IsMatch(stringtoken)) this.TipoDToken = TiposDToken.Number;
+            else if (ExpresionesRegulares.Print.IsMatch(stringtoken)) this.TipoDToken = TiposDToken.Print;
+            else if (ExpresionesRegulares.Assign.IsMatch(stringtoken)) this.TipoDToken = TiposDToken.Assign;
+            else if (ExpresionesRegulares.Let.IsMatch(stringtoken)) this.TipoDToken = TiposDToken.Let;
+            else if (ExpresionesRegulares.In.IsMatch(stringtoken)) this.TipoDToken = TiposDToken.In;
+            else if (ExpresionesRegulares.Identificador.IsMatch(stringtoken)) this.TipoDToken = TiposDToken.Identificador;
             else this.TipoDToken = TiposDToken.InvalidToken;
         }
     }
@@ -82,5 +87,10 @@ namespace ClassLibrary1
         static public Regex Coma = new Regex(",");
         static public Regex PuntoComa = new Regex(";");
         static public Regex numero = new Regex(@"\d+");// ^[0-9]+([,][0-9]+)?$ para numeros con coma, revisar
+        static public Regex Print = new Regex("print");
+        static public Regex Let = new Regex("let");
+        static public Regex In = new Regex("in");
+        static public Regex Assign = new Regex("=");
+        static public Regex Identificador = new Regex("[a-zA-Z_][0-9a-zA-Z_]*");
     }
 }
