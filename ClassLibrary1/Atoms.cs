@@ -10,3 +10,20 @@ public abstract class AtomExpression : Expression
 
     public override string ToString() => String.Format("{0}",Value);
 }
+public class Boolean : AtomExpression
+{
+    public  override object? Value { get; set; }
+
+    public Boolean(bool value,int Location):base(Location)
+    {
+        this.Value = value;
+    }
+
+    public Boolean Not()
+    {
+        return new Boolean(!(bool)Value,Location-1);
+    }
+
+    public override ExpressionType Type { get { return ExpressionType.Boolean; } set { } }
+}
+

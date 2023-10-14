@@ -9,7 +9,7 @@ public class Parser
 
     public TokenStream Stream { get; private set; }
 
-    public  VariableScope DefVariables { get; private set; }
+    public VariableScope DefVariables { get; private set; }
 
     public StatementNode? ParseStament()
     {
@@ -48,15 +48,127 @@ public class Parser
             int location = Stream.Position;
             Stream.NextToken(2);
             var exp = ParseExpression();
-            var DeclVar = new VariableDeclarationNode(variable, exp, DefVariables,location);
+            var DeclVar = new VariableDeclarationNode(variable, exp, DefVariables, location);
             DeclVar.Execute();
             if (!Stream.FindToken(TiposDToken.Coma)) count = 0;
-            
+
         }
     }
     public Expression? ParseExpression()
     {
-        return ParseExpressionLv1();
+        var exp = ParseExpressionBoolean();
+        if (exp != null) return exp;
+
+        exp = ParseExpressionLv1();
+        if (exp != null) return exp;
+
+        return null;
+    }
+    private Expression? ParseExpressionBoolean()
+    {
+        return ParseExpBooleanLv1();
+    }
+    private Expression? ParseExpBooleanLv1()
+    {
+        Expression? left = ParseExpBooleanLv2();
+        return ParseExpBooleanLv1_(left);
+    }
+    private Expression? ParseExpBooleanLv1_(Expression? left)
+    {
+        Expression? exp = ParseOR(left);
+        if (exp != null) return exp;
+        return left ;
+    }
+    private Expression? ParseExpBooleanLv2()
+    {
+        Expression? newLeft = ParseExpBooleanLv3();
+        return ParseExpBooleanLv2_(newLeft);
+    }
+    private Expression? ParseExpBooleanLv2_(Expression? left)
+    {
+        Expression? exp = ParseAnd(left);
+        if (exp != null) return exp;
+        return left;
+    }
+    private Expression? ParseExpBooleanLv3()
+    {
+        Expression? exp = ParseBoolean();
+        if (exp != null) return exp;
+
+        Expression? left = ParseExpressionLv1();
+        exp = ParseBooleanOP(left);
+        if (exp != null) return exp;
+
+        return null;
+    }
+
+    private Expression? ParseBooleanOP(Expression? left)
+    {
+        if (left == null) return null;
+        if (Stream.FindToken(TiposDToken.Igual))
+        {
+            var exp = new Igualdad(Stream.Position);
+            exp.Left = left;
+            Stream.NextToken();
+            Expression? right = ParseExpressionLv1();
+            if (right == null) return null;
+            exp.Right = right;
+            return exp;
+        }
+        else if (Stream.FindToken(TiposDToken.Mayorq))
+        {
+            var exp = new Mayor(Stream.Position);
+            exp.Left = left;
+            Stream.NextToken();
+            Expression? right = ParseExpressionLv1();
+            if (right == null) return null;
+            exp.Right = right;
+            return exp;
+        }
+        else if (Stream.FindToken(TiposDToken.Menorq))
+        {
+            var exp = new Menor(Stream.Position);
+            exp.Left = left;
+            Stream.NextToken();
+            Expression? right = ParseExpressionLv1();
+            if (right == null) return null;
+            exp.Right = right;
+            return exp;
+        }
+        else return null;
+
+    }
+
+    private Expression? ParseBoolean()
+    {
+        if (Stream.IsToken(TiposDToken.Bool))
+        {
+            return new Boolean(bool.Parse(Stream.CurrentToken().StringToken), Stream.Position);
+        }
+        return null;
+    }
+
+    private Expression? ParseOR(Expression? left)
+    {
+        var Or = new OpOr(Stream.Position);
+        if (left == null || !Stream.FindToken(TiposDToken.Or)) return null;
+        Or.Left = left;
+        Stream.NextToken();
+        Expression? right = ParseExpBooleanLv2();
+        if (right == null) return null;
+        Or.Right = right;
+        return Or;
+    }
+    private Expression? ParseAnd(Expression? left)
+    {
+        var And = new OpAnd(Stream.Position);
+        if (left == null || !Stream.FindToken(TiposDToken.And)) return null;
+        And.Left = left;
+        Stream.NextToken();
+        Expression? right = ParseExpBooleanLv3();
+        if (right == null) return null;
+        And.Right = right;
+        return And;
     }
 
     private Expression? ParseExpressionLv1()
@@ -370,7 +482,7 @@ public class Parser
     {
         if (Stream.IsToken(TiposDToken.Identificador))
         {
-            return new VariableReference(Stream.CurrentToken().StringToken, DefVariables,Stream.Position);
+            return new VariableReference(Stream.CurrentToken().StringToken, DefVariables, Stream.Position);
         }
         return null;
     }
@@ -380,7 +492,7 @@ public class Parser
 
 public class VariableScope
 {
-    public  Dictionary<string, object> variables = new Dictionary<string, object>();
+    public Dictionary<string, object> variables = new Dictionary<string, object>();
 
     public void AddVariable(string identifier, object value)
     {

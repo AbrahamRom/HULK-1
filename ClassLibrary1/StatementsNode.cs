@@ -44,13 +44,13 @@ namespace ClassLibrary1
         public VariableDeclarationNode(string identifier, Expression? exp, VariableScope variables, int Location) : base(Location)
         {
             this.Location = Location;
-            this.Exp=exp;
-            this.identifier=identifier;
-            this.DefVariables=variables;
+            this.Exp = exp;
+            this.identifier = identifier;
+            this.DefVariables = variables;
         }
         public string identifier { get; set; }
         public Expression? Exp { get; set; }
-        public  VariableScope DefVariables { get; set; }
+        public VariableScope DefVariables { get; set; }
 
         public override void Execute()
         {
@@ -61,5 +61,99 @@ namespace ClassLibrary1
         }
 
         public override bool CheckSemantic(Context context, Scope scope, List<CompilingError> errors) => true;
+    }
+
+    public class FunctionDeclarationNode : StatementNode
+    {
+        public string Identifier { get; }
+        public List<string> Parameters { get; }
+        public StatementNode Body { get; }
+
+        public FunctionDeclarationNode(string identifier, List<string> parameters, StatementNode body, int Location) : base(Location)
+        {
+            Identifier = identifier;
+            Parameters = parameters;
+            Body = body;
+        }
+
+        public override void Execute()
+        {
+            var function = new FunctionDefinition(Parameters, Body);
+            FunctionScope.AddFunction(Identifier, function);
+            //return Identifier; // Devuelve el nombre de la función declarada
+        }
+
+        public override bool CheckSemantic(Context context, Scope scope, List<CompilingError> errors) => true;
+
+    }
+
+    public class FunctionDefinition
+    {
+        public List<string> Parameters { get; }
+        public StatementNode Body { get; }
+
+        public FunctionDefinition(List<string> parameters, StatementNode body)
+        {
+            Parameters = parameters;
+            Body = body;
+        }
+
+        //public object Invoke(List<ExpressionNode> arguments)
+        //{
+        //    if (arguments.Count != Parameters.Count)
+        //    {
+        //        throw new Exception($"Semantic error: Function '{Parameters[0]}' receives {Parameters.Count} argument(s), but {arguments.Count} were given.");
+        //    }
+
+        //    // Establece los valores de los argumentos en el ámbito de variables
+        //    for (int i = 0; i < Parameters.Count; i++)
+        //    {
+        //        string parameter = Parameters[i];
+        //        ExpressionNode argument = arguments[i];
+        //        var value = argument.Evaluate();
+        //        VariableScope.AddVariable(parameter, value);
+        //    }
+
+        //    // Ejecuta el cuerpo de la función
+        //    Body.Execute();
+
+        //    // Obtiene el valor de retorno de la función
+        //    var returnValue = VariableScope.GetVariableValue(FunctionScope.ReturnVariable);
+
+        //    // Limpia las variables del ámbito de variables
+        //    VariableScope.ClearVariables();
+
+        //    return returnValue;
+        //}
+
+
+    }
+
+    public static class FunctionScope
+    {
+        private static Dictionary<string, FunctionDefinition> functions = new Dictionary<string, FunctionDefinition>();
+        //  public static string ReturnVariable { get; } = "__return__";
+
+        public static void AddFunction(string identifier, FunctionDefinition function)
+        {
+            functions.Add(identifier, function);
+        }
+
+        public static FunctionDefinition GetFunction(string identifier)
+        {
+            if (functions.ContainsKey(identifier))
+            {
+                return functions[identifier];
+            }
+            else
+            {
+                throw new Exception($"Semantic error: Function '{identifier}' does not exist.");
+            }
+        }
+
+        public static bool ContainsFunction(string identifier)
+        {
+            return functions.ContainsKey(identifier);
+        }
     }
 }

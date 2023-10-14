@@ -43,3 +43,80 @@ public abstract class BinaryExpression : Expression
     //    return right && left;
     //}
 }
+public class OpAnd : BinaryExpression
+{
+   
+    public override object? Value { get; set; }
+
+    public OpAnd(int Location) : base(Location) { }
+
+    public override void Evaluate()
+    {
+        Left.Evaluate(); Right.Evaluate();
+        Value = ((bool)Left.Value! && (bool)Right.Value!);
+    }
+    public override ExpressionType Type { get { return ExpressionType.Boolean; } set { } }
+}
+public class OpOr : BinaryExpression
+{
+   
+    public override object? Value { get; set; }
+
+    public OpOr(int Location) : base(Location) { }
+
+    public override void Evaluate()
+    {
+        Left.Evaluate(); Right.Evaluate();
+        Value = ((bool)Left.Value! || (bool)Right.Value!);
+    }
+    public override ExpressionType Type { get { return ExpressionType.Boolean; } set { } }
+}
+
+public class Igualdad:BinaryExpression
+{
+  
+    public override object? Value { get; set; }
+
+    public Igualdad(int Location) : base(Location) { }
+   
+
+    public override void Evaluate()
+    {
+        Left.Evaluate(); Right.Evaluate();
+        Value =((double)Left.Value! == (double)Right.Value!);
+    }
+
+    public override ExpressionType Type { get { return ExpressionType.Boolean; } set { } }
+}
+public class Mayor : BinaryExpression
+{
+   
+    public override object? Value { get; set; }
+
+    public Mayor(int Location) : base(Location) { }
+    
+
+    public override void Evaluate()
+    {
+        Left.Evaluate(); Right.Evaluate();
+        Value = (bool)((double)Left.Value! > (double)Right.Value!);
+    }
+
+    public override ExpressionType Type { get { return ExpressionType.Boolean; } set { } }
+}
+public class Menor : BinaryExpression
+{
+   
+    public override object? Value { get; set; }
+
+    public Menor( int Location) : base(Location) { }
+   
+
+    public override void Evaluate()
+    {
+        Left.Evaluate(); Right.Evaluate();
+        Value = (bool)((double)Left.Value! < (double)Right.Value!);
+    }
+
+    public override ExpressionType Type { get { return ExpressionType.Boolean; } set { } }
+}
