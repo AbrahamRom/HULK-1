@@ -24,7 +24,20 @@ namespace ClassLibrary1
         {
             InsideParentesis!.Evaluate();
 
-            Value = (double)InsideParentesis.Value!;
+
+            if (double.TryParse(InsideParentesis.Value!.ToString(), out double result))
+            {
+                Value = result;
+            }
+            else if (bool.TryParse(InsideParentesis.Value!.ToString(), out bool boolResult))
+            {
+                Value = boolResult;
+            }
+            else
+            {
+               Value = null;
+            }
+
         }
         public Expression? NegateParentesis()
         {

@@ -21,9 +21,19 @@ public class Boolean : AtomExpression
 
     public Boolean Not()
     {
-        return new Boolean(!(bool)Value,Location-1);
+        return new Boolean(!(bool)Value!,Location-1);
     }
 
     public override ExpressionType Type { get { return ExpressionType.Boolean; } set { } }
+}
+public class StringLiteral : AtomExpression
+{
+    public override object? Value { get; set; }
+
+    public StringLiteral(string value, int Location) : base(Location)
+    {
+        this.Value = value;
+    }
+    public override ExpressionType Type { get { return ExpressionType.StringLiteral; } set { } }
 }
 

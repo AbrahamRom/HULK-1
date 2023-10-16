@@ -13,7 +13,7 @@ public abstract class Expression : ASTNode
 public enum ExpressionType
 {
     Anytype,
-    Text,
+    StringLiteral,
     Number,
     Boolean,
     ErrorType

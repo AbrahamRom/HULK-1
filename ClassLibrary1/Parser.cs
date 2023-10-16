@@ -92,13 +92,32 @@ public class Parser
     }
     private Expression? ParseExpBooleanLv3()
     {
-        Expression? exp = ParseBoolean();
+        Expression? exp = ParseString();
         if (exp != null) return exp;
+
+         exp = ParseBoolean();
+        if (exp != null) return exp;
+
+        exp = ParseParentesis();
+        if (exp != null) return exp;
+
+        //exp = ParseVariableReference();
+        //if (exp != null) return exp;
 
         Expression? left = ParseExpressionLv1();
         exp = ParseBooleanOP(left);
         if (exp != null) return exp;
 
+        return null;
+    }
+
+    private Expression? ParseString()
+    {
+      //var x =  Stream.CurrentToken().StringToken;
+        if (Stream.IsToken(TiposDToken.StringLiteral))
+        {
+            return new StringLiteral(Stream.CurrentToken().StringToken.Substring(1, Stream.CurrentToken().StringToken.Length-2), Stream.Position);
+        }
         return null;
     }
 
