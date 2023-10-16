@@ -16,6 +16,9 @@ public class Parser
         StatementNode? Statement = ParsePrint();
         if (Statement != null) return Statement;
 
+        Statement = ParseIfElseStatement();
+        if (Statement != null) return Statement;
+
         ParseParseVariableDeclaration();
         if (Stream.FindToken(TiposDToken.In))
         {
@@ -26,6 +29,23 @@ public class Parser
 
         return null;
     }
+
+    private StatementNode? ParseIfElseStatement()
+    {
+        if (!Stream.IsToken(TiposDToken.If)) return null;
+        if (!Stream.FindToken(TiposDToken.OpenParentesis)) return null;
+        Stream.NextToken();
+        var statement = new IfStatementNode(Stream.Position-2);
+        statement.Condition = ParseExpressionBoolean();
+        //  if (!Stream.FindToken(TiposDToken.CloseParentesis)) return null;
+        Stream.NextToken();
+        statement.IfBody = ParseStament();
+        if (!Stream.FindToken(TiposDToken.Else)) return null;
+        Stream.NextToken();
+        statement.ElseBody = ParseStament();
+        return statement;
+    }
+
     private StatementNode? ParsePrint()
     {
         if (!Stream.IsToken(TiposDToken.Print)) return null;
@@ -71,7 +91,13 @@ public class Parser
     private Expression? ParseExpBooleanLv1()
     {
         Expression? left = ParseExpBooleanLv2();
-        return ParseExpBooleanLv1_(left);
+        Expression? exp = ParseExpBooleanLv1_(left);
+        if (Stream.FindToken(TiposDToken.CloseParentesis))
+        {
+            exp = ParseExpBooleanLv1_(exp);
+        }
+        return exp;
+
     }
     private Expression? ParseExpBooleanLv1_(Expression? left)
     {
@@ -101,12 +127,14 @@ public class Parser
         exp = ParseParentesis();
         if (exp != null) return exp;
 
-        //exp = ParseVariableReference();
-        //if (exp != null) return exp;
 
         Expression? left = ParseExpressionLv1();
         exp = ParseBooleanOP(left);
         if (exp != null) return exp;
+
+
+        //exp = ParseVariableReference();
+        //if (exp != null) return exp;
 
         return null;
     }
@@ -154,7 +182,7 @@ public class Parser
             exp.Right = right;
             return exp;
         }
-        else return null;
+        else return left;
 
     }
 

@@ -63,6 +63,33 @@ namespace ClassLibrary1
         public override bool CheckSemantic(Context context, Scope scope, List<CompilingError> errors) => true;
     }
 
+    public class IfStatementNode : StatementNode
+    {
+        public Expression? Condition { get; set; }
+        public StatementNode? IfBody { get; set; }
+        public StatementNode? ElseBody { get; set; }
+
+        public IfStatementNode(int Location):base(Location) 
+        {
+            this.Location=Location;
+        }
+
+        public override void Execute()
+        {
+            Condition.Evaluate();
+            var conditionValue = Condition.Value;
+            if (Convert.ToBoolean(conditionValue))
+            {
+                IfBody.Execute();
+            }
+            else
+            {
+                ElseBody.Execute();
+            }
+        }
+        public override bool CheckSemantic(Context context, Scope scope, List<CompilingError> errors) => true;
+    }
+
     public class FunctionDeclarationNode : StatementNode
     {
         public string Identifier { get; }
