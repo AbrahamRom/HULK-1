@@ -34,6 +34,7 @@ namespace Hulk_Interface
                 //Console.WriteLine(x.Value);
                 var Statement = Parser.ParseStament();
                 Statement.Execute();
+                Console.WriteLine(FunctionScope.functions.Count);
 
             }
         }

@@ -9,7 +9,7 @@ namespace ClassLibrary1
 {
     public class Lexer
     {
-        static string TokenUnion = ExpresionesRegulares.OpSuma.ToString() + "|" + ExpresionesRegulares.OpResta.ToString() + "|" + ExpresionesRegulares.OpMultiply.ToString() + "|" + ExpresionesRegulares.OpDivide.ToString() + "|" + ExpresionesRegulares.Potencia.ToString() + "|" + ExpresionesRegulares.NumberPI.ToString() + "|" + ExpresionesRegulares.Seno.ToString() + "|" + ExpresionesRegulares.Coseno.ToString() + "|" + ExpresionesRegulares.Logaritmo.ToString() + "|" + ExpresionesRegulares.OpenParentesis.ToString() + "|" + ExpresionesRegulares.CloseParentesis.ToString() + "|" + ExpresionesRegulares.Coma.ToString() + "|" + ExpresionesRegulares.PuntoComa.ToString() + "|" + ExpresionesRegulares.StringLiteral.ToString() + "|" + ExpresionesRegulares.numero.ToString() + "|" + ExpresionesRegulares.Bool.ToString() + "|" + ExpresionesRegulares.And.ToString() + "|" + ExpresionesRegulares.Or.ToString() + "|" + ExpresionesRegulares.Igual.ToString() + "|" + ExpresionesRegulares.Mayorq.ToString() + "|" + ExpresionesRegulares.Menorq.ToString() + "|" + ExpresionesRegulares.Negacion.ToString() + "|" + ExpresionesRegulares.Print.ToString() + "|" + ExpresionesRegulares.If.ToString() + "|" + ExpresionesRegulares.Else.ToString() + "|" + ExpresionesRegulares.Let.ToString() + "|" + ExpresionesRegulares.In.ToString() + "|" + ExpresionesRegulares.Assign.ToString() + "|" + ExpresionesRegulares.Identificador.ToString();
+        static string TokenUnion = ExpresionesRegulares.OpSuma.ToString() + "|" + ExpresionesRegulares.OpResta.ToString() + "|" + ExpresionesRegulares.OpMultiply.ToString() + "|" + ExpresionesRegulares.OpDivide.ToString() + "|" + ExpresionesRegulares.Potencia.ToString() + "|" + ExpresionesRegulares.NumberPI.ToString() + "|" + ExpresionesRegulares.Seno.ToString() + "|" + ExpresionesRegulares.Coseno.ToString() + "|" + ExpresionesRegulares.Logaritmo.ToString() + "|" + ExpresionesRegulares.OpenParentesis.ToString() + "|" + ExpresionesRegulares.CloseParentesis.ToString() + "|" + ExpresionesRegulares.Coma.ToString() + "|" + ExpresionesRegulares.PuntoComa.ToString() + "|" + ExpresionesRegulares.StringLiteral.ToString() + "|" + ExpresionesRegulares.numero.ToString() + "|" + ExpresionesRegulares.Bool.ToString() + "|" + ExpresionesRegulares.And.ToString() + "|" + ExpresionesRegulares.Or.ToString() + "|" + ExpresionesRegulares.Igual.ToString() + "|" + ExpresionesRegulares.Mayorq.ToString() + "|" + ExpresionesRegulares.Menorq.ToString() + "|" + ExpresionesRegulares.Negacion.ToString() + "|" + ExpresionesRegulares.FunctionDef.ToString() + "|" + ExpresionesRegulares.Function.ToString() + "|" + ExpresionesRegulares.Print.ToString() + "|" + ExpresionesRegulares.If.ToString() + "|" + ExpresionesRegulares.Else.ToString() + "|" + ExpresionesRegulares.Let.ToString() + "|" + ExpresionesRegulares.In.ToString() + "|" + ExpresionesRegulares.Assign.ToString() + "|" + ExpresionesRegulares.Identificador.ToString();
         static Regex separador = new Regex(TokenUnion); // el regex que se usa para separar los tokens // se lleva los errores de errores invalidos ARREGLAR
 
         public Token[] ArrayObjectToken;
@@ -37,7 +37,7 @@ namespace ClassLibrary1
             }
         }
     }
-    public enum TiposDToken { OpSuma, OpResta, OpMultiply, OpDivide, OpenParentesis, CloseParentesis, PuntoComa, Number, Potencia, NumberPI, Seno, Coseno, Logaritmo,Coma, Print,Identificador,Let,In,Assign,  Bool, Igual, Mayorq, Menorq, Negacion, And,Or, StringLiteral,If,Else, InvalidToken }
+    public enum TiposDToken { OpSuma, OpResta, OpMultiply, OpDivide, OpenParentesis, CloseParentesis, PuntoComa, Number, Potencia, NumberPI, Seno, Coseno, Logaritmo,Coma, Print,Identificador,Let,In,Assign,  Bool, Igual, Mayorq, Menorq, Negacion, And,Or, StringLiteral,If,Else, Function, FunctionDef, InvalidToken }
     public class Token
     {
         public TiposDToken TipoDToken;
@@ -67,10 +67,13 @@ namespace ClassLibrary1
            // else if (ExpresionesRegulares.BoolFalse.IsMatch(stringtoken)) this.TipoDToken = TiposDToken.BoolFalse;
             else if (ExpresionesRegulares.And.IsMatch(stringtoken)) this.TipoDToken = TiposDToken.And;
             else if (ExpresionesRegulares.Or.IsMatch(stringtoken)) this.TipoDToken = TiposDToken.Or;
+            else if (ExpresionesRegulares.FunctionDef.IsMatch(stringtoken)) this.TipoDToken = TiposDToken.FunctionDef;
             else if (ExpresionesRegulares.Igual.IsMatch(stringtoken)) this.TipoDToken = TiposDToken.Igual;
             else if (ExpresionesRegulares.Mayorq.IsMatch(stringtoken)) this.TipoDToken = TiposDToken.Mayorq;
             else if (ExpresionesRegulares.Menorq.IsMatch(stringtoken)) this.TipoDToken = TiposDToken.Menorq;
             else if (ExpresionesRegulares.Negacion.IsMatch(stringtoken)) this.TipoDToken = TiposDToken.Negacion;
+           
+            else if (ExpresionesRegulares.Function.IsMatch(stringtoken)) this.TipoDToken = TiposDToken.Function;
             else if (ExpresionesRegulares.Print.IsMatch(stringtoken)) this.TipoDToken = TiposDToken.Print;
             else if (ExpresionesRegulares.If.IsMatch(stringtoken)) this.TipoDToken = TiposDToken.If;
             else if (ExpresionesRegulares.Else.IsMatch(stringtoken)) this.TipoDToken = TiposDToken.Else;
@@ -107,6 +110,8 @@ namespace ClassLibrary1
         static public Regex Mayorq = new Regex(">");
         static public Regex Menorq = new Regex("<");
         static public Regex Negacion = new Regex("!");
+        static public Regex FunctionDef = new Regex("=>");
+        static public Regex Function = new Regex("function");
         static public Regex Print = new Regex("print");
         static public Regex Let = new Regex("let");
         static public Regex In = new Regex("in");

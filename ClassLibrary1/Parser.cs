@@ -16,6 +16,9 @@ public class Parser
         StatementNode? Statement = ParsePrint();
         if (Statement != null) return Statement;
 
+        Statement = ParseFunctionDeclaration();
+        if (Statement != null) return Statement;
+
         Statement = ParseIfElseStatement();
         if (Statement != null) return Statement;
 
@@ -30,12 +33,37 @@ public class Parser
         return null;
     }
 
+    private StatementNode? ParseFunctionDeclaration()
+    {
+        if (!Stream.IsToken(TiposDToken.Function)) return null;
+        var function = new FunctionDeclarationNode(Stream.Position - 3);
+        if (!Stream.FindToken(TiposDToken.Identificador)) return null;
+        function.Identifier = Stream.CurrentToken().StringToken;
+        if (!Stream.FindToken(TiposDToken.OpenParentesis)) return null;
+
+        int count = 1;
+        while (count == 1)
+        {
+            if (!Stream.FindToken(TiposDToken.Identificador)) return null;
+            function.AddParameter(Stream.CurrentToken().StringToken);
+            if (!Stream.FindToken(TiposDToken.Coma)) count = 0;
+        }
+        if (!Stream.FindToken(TiposDToken.CloseParentesis)) return null;
+        if (!Stream.FindToken(TiposDToken.FunctionDef)) return null;
+
+        Stream.NextToken();
+
+        function.Body = ParseExpression();
+        return function;
+
+    }
+
     private StatementNode? ParseIfElseStatement()
     {
         if (!Stream.IsToken(TiposDToken.If)) return null;
         if (!Stream.FindToken(TiposDToken.OpenParentesis)) return null;
         Stream.NextToken();
-        var statement = new IfStatementNode(Stream.Position-2);
+        var statement = new IfStatementNode(Stream.Position - 2);
         statement.Condition = ParseExpressionBoolean();
         //  if (!Stream.FindToken(TiposDToken.CloseParentesis)) return null;
         Stream.NextToken();
@@ -103,7 +131,7 @@ public class Parser
     {
         Expression? exp = ParseOR(left);
         if (exp != null) return exp;
-        return left ;
+        return left;
     }
     private Expression? ParseExpBooleanLv2()
     {
@@ -121,7 +149,7 @@ public class Parser
         Expression? exp = ParseString();
         if (exp != null) return exp;
 
-         exp = ParseBoolean();
+        exp = ParseBoolean();
         if (exp != null) return exp;
 
         exp = ParseParentesis();
@@ -141,10 +169,10 @@ public class Parser
 
     private Expression? ParseString()
     {
-      //var x =  Stream.CurrentToken().StringToken;
+        //var x =  Stream.CurrentToken().StringToken;
         if (Stream.IsToken(TiposDToken.StringLiteral))
         {
-            return new StringLiteral(Stream.CurrentToken().StringToken.Substring(1, Stream.CurrentToken().StringToken.Length-2), Stream.Position);
+            return new StringLiteral(Stream.CurrentToken().StringToken.Substring(1, Stream.CurrentToken().StringToken.Length - 2), Stream.Position);
         }
         return null;
     }
@@ -279,6 +307,9 @@ public class Parser
         exp = ParseVariableReference();
         if (exp != null) return exp;
 
+        exp = ParseFunctionReference();
+        if (exp != null) return exp;
+
         exp = ParseCoseno();
         if (exp != null) return exp;
 
@@ -290,8 +321,32 @@ public class Parser
 
         exp = ParseParentesis();
         if (exp != null) return exp;
-
         return null;
+    }
+
+    private Expression? ParseFunctionReference()
+    {
+        if (!Stream.IsToken(TiposDToken.Identificador) || !FunctionScope.ContainsFunction(Stream.CurrentToken().StringToken)) return null;
+        var identificador = Stream.CurrentToken().StringToken;
+        var function = FunctionScope.GetFunction(Stream.CurrentToken().StringToken);
+        if (!Stream.FindToken(TiposDToken.OpenParentesis)) return null;
+        var arguments = ParseArgumentsFunc();
+        return function.Invoke(arguments, DefVariables);
+
+    }
+    private List<Expression> ParseArgumentsFunc()
+    {
+        var Arguments = new List<Expression>();
+        int count = 1;
+        while (count == 1)
+        {
+            Stream.NextToken();
+            Arguments.Add(ParseExpression());
+            if (!Stream.FindToken(TiposDToken.Coma)) count = 0;
+
+        }
+        Stream.NextToken();//revisar
+        return Arguments;
     }
 
     private Expression? ParseAdd(Expression? left)
@@ -527,7 +582,7 @@ public class Parser
 
     private Expression? ParseVariableReference()
     {
-        if (Stream.IsToken(TiposDToken.Identificador))
+        if (Stream.IsToken(TiposDToken.Identificador) && DefVariables.ContainsVariable(Stream.CurrentToken().StringToken))
         {
             return new VariableReference(Stream.CurrentToken().StringToken, DefVariables, Stream.Position);
         }

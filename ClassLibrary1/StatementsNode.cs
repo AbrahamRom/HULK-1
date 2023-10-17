@@ -69,9 +69,9 @@ namespace ClassLibrary1
         public StatementNode? IfBody { get; set; }
         public StatementNode? ElseBody { get; set; }
 
-        public IfStatementNode(int Location):base(Location) 
+        public IfStatementNode(int Location) : base(Location)
         {
-            this.Location=Location;
+            this.Location = Location;
         }
 
         public override void Execute()
@@ -92,22 +92,29 @@ namespace ClassLibrary1
 
     public class FunctionDeclarationNode : StatementNode
     {
-        public string Identifier { get; }
-        public List<string> Parameters { get; }
-        public StatementNode Body { get; }
+        public string Identifier { get; set; }
+        public List<string> Parameters { get; set; }
+        public Expression? Body { get; set; }
 
-        public FunctionDeclarationNode(string identifier, List<string> parameters, StatementNode body, int Location) : base(Location)
+        public FunctionDeclarationNode(int Location) : base(Location)
         {
-            Identifier = identifier;
-            Parameters = parameters;
-            Body = body;
+            Parameters = new List<string>();
         }
+
 
         public override void Execute()
         {
-            var function = new FunctionDefinition(Parameters, Body);
+            var function = new FunctionDefinition();
+            function.Parameters = Parameters;
+            function.Body = Body;
             FunctionScope.AddFunction(Identifier, function);
             //return Identifier; // Devuelve el nombre de la función declarada
+            Console.WriteLine(Identifier);
+        }
+
+        public void AddParameter(string parameter)
+        {
+            this.Parameters.Add(parameter);
         }
 
         public override bool CheckSemantic(Context context, Scope scope, List<CompilingError> errors) => true;
@@ -116,49 +123,52 @@ namespace ClassLibrary1
 
     public class FunctionDefinition
     {
-        public List<string> Parameters { get; }
-        public StatementNode Body { get; }
+        public List<string> Parameters { get; set; }
+        public Expression? Body { get; set; }
 
-        public FunctionDefinition(List<string> parameters, StatementNode body)
-        {
-            Parameters = parameters;
-            Body = body;
-        }
+        public FunctionDefinition() { }
 
-        //public object Invoke(List<ExpressionNode> arguments)
+        //public void AddParameter(string parameter)
         //{
-        //    if (arguments.Count != Parameters.Count)
-        //    {
-        //        throw new Exception($"Semantic error: Function '{Parameters[0]}' receives {Parameters.Count} argument(s), but {arguments.Count} were given.");
-        //    }
-
-        //    // Establece los valores de los argumentos en el ámbito de variables
-        //    for (int i = 0; i < Parameters.Count; i++)
-        //    {
-        //        string parameter = Parameters[i];
-        //        ExpressionNode argument = arguments[i];
-        //        var value = argument.Evaluate();
-        //        VariableScope.AddVariable(parameter, value);
-        //    }
-
-        //    // Ejecuta el cuerpo de la función
-        //    Body.Execute();
-
-        //    // Obtiene el valor de retorno de la función
-        //    var returnValue = VariableScope.GetVariableValue(FunctionScope.ReturnVariable);
-
-        //    // Limpia las variables del ámbito de variables
-        //    VariableScope.ClearVariables();
-
-        //    return returnValue;
+        //    this.Parameters.Add(parameter);
         //}
+
+        public Expression? Invoke(List<Expression> arguments, VariableScope variables)
+        {
+            if (arguments.Count != Parameters.Count)
+            {
+                throw new Exception($"Semantic error: Function '{Parameters[0]}' receives {Parameters.Count} argument(s), but {arguments.Count} were given.");
+            }
+
+            // Establece los valores de los argumentos en el ámbito de variables
+            for (int i = 0; i < Parameters.Count; i++)
+            {
+                string parameter = Parameters[i];
+                Expression argument = arguments[i];
+                argument.Evaluate();
+                var value = argument.Value;
+                variables.AddVariable(parameter, value);
+            }
+
+            // Ejecuta el cuerpo de la función
+            Body.Evaluate();
+
+            return Body;
+            //// Obtiene el valor de retorno de la función
+            //var returnValue = VariableScope.GetVariableValue(FunctionScope.ReturnVariable);
+
+            //// Limpia las variables del ámbito de variables
+            //VariableScope.ClearVariables();
+
+            //return returnValue;
+        }
 
 
     }
 
     public static class FunctionScope
     {
-        private static Dictionary<string, FunctionDefinition> functions = new Dictionary<string, FunctionDefinition>();
+        public static Dictionary<string, FunctionDefinition> functions = new Dictionary<string, FunctionDefinition>();
         //  public static string ReturnVariable { get; } = "__return__";
 
         public static void AddFunction(string identifier, FunctionDefinition function)

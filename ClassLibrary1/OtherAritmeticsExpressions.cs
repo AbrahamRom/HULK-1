@@ -143,7 +143,7 @@ namespace ClassLibrary1
        public override ExpressionType Type { get; set; }
         public VariableScope VariableScope { get; set; }
 
-        public override object Value
+        public override object? Value
         {
             get
             {
@@ -160,4 +160,12 @@ namespace ClassLibrary1
         }
 
     }
+
+    //public class FuncionReference : AtomExpression
+    //{
+    //    public FuncionReference(int Location) : base(Location)
+    //    {
+
+    //    }
+    //}
 }
