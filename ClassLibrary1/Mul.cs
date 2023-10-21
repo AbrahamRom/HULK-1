@@ -9,8 +9,8 @@ public class Mul : BinaryExpression
 
     public override void Evaluate()
     {
-        Right!.Evaluate();
-        Left!.Evaluate();
+        Right.Evaluate();
+        Left.Evaluate();
         
         Value = (double)Right.Value! * (double)Left.Value!;
     }
