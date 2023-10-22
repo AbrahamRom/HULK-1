@@ -14,7 +14,7 @@ namespace ClassLibrary1
             this.Location = Location;
         }
 
-        public abstract void Execute();
+        public abstract object? Execute();
 
     }
 
@@ -28,11 +28,12 @@ namespace ClassLibrary1
             InsideParentesis = insideof;
         }
 
-        public override void Execute()
+        public override object? Execute()
         {
             InsideParentesis.Evaluate();
-
-            Console.WriteLine(InsideParentesis.Value);
+            var x = InsideParentesis.Value;
+            Console.WriteLine(x);
+            return x;
         }
 
         public override bool CheckSemantic(Context context, Scope scope, List<CompilingError> errors) => true;
@@ -52,12 +53,13 @@ namespace ClassLibrary1
         public Expression? Exp { get; set; }
         public VariableScope DefVariables { get; set; }
 
-        public override void Execute()
+        public override object? Execute()
         {
             // Obtener el valor de la expresión
             Exp.Evaluate();
             // Declarar la variable y asignarle el valor
             DefVariables.AddVariable(identifier, Exp.Value);
+            return null;
         }
 
         public override bool CheckSemantic(Context context, Scope scope, List<CompilingError> errors) => true;
