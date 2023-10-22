@@ -32,19 +32,6 @@ namespace ClassLibrary1
         }
     }
 
-    //public class NumberPI : AtomExpression
-    //{
-    //    public NumberPI (int Location) : base(Location) { }
-
-    //    public override object? Value { get { return Math.PI; } set { } }
-
-    //    public override ExpressionType Type
-    //    {
-    //        get { return ExpressionType.Number; }
-    //        set { }
-    //    }
-    //}
-
     public class Coseno : AtomExpression
     {
         public Coseno(int Location) : base(Location) { }
@@ -161,11 +148,4 @@ namespace ClassLibrary1
 
     }
 
-    //public class FuncionReference : AtomExpression
-    //{
-    //    public FuncionReference(int Location) : base(Location)
-    //    {
-
-    //    }
-    //}
 }

@@ -6,11 +6,8 @@ public class Parser
         Stream = stream;
         DefVariables = new VariableScope();
     }
-
     public TokenStream Stream { get; private set; }
-
     public VariableScope DefVariables { get; private set; }
-
     public StatementNode? ParseStament()
     {
         StatementNode? Statement = ParsePrint();
@@ -32,7 +29,6 @@ public class Parser
 
         return null;
     }
-
     private StatementNode? ParseFunctionDeclaration()
     {
         if (!Stream.IsToken(TiposDToken.Function)) return null;
@@ -57,7 +53,6 @@ public class Parser
         return function;
 
     }
-
     private StatementNode? ParseIfElseStatement()
     {
         if (!Stream.IsToken(TiposDToken.If)) return null;
@@ -73,7 +68,6 @@ public class Parser
         statement.ElseBody = ParseStament();
         return statement;
     }
-
     private StatementNode? ParsePrint()
     {
         if (!Stream.IsToken(TiposDToken.Print)) return null;
@@ -102,6 +96,20 @@ public class Parser
 
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     public Expression? ParseExpression()
     {
         var exp = ParseExpressionBoolean();
@@ -166,7 +174,6 @@ public class Parser
 
         return null;
     }
-
     private Expression? ParseString()
     {
         //var x =  Stream.CurrentToken().StringToken;
@@ -176,7 +183,6 @@ public class Parser
         }
         return null;
     }
-
     private Expression? ParseBooleanOP(Expression? left)
     {
         if (left == null) return null;
@@ -213,7 +219,6 @@ public class Parser
         else return left;
 
     }
-
     private Expression? ParseBoolean()
     {
         if (Stream.IsToken(TiposDToken.Bool))
@@ -222,7 +227,6 @@ public class Parser
         }
         return null;
     }
-
     private Expression? ParseOR(Expression? left)
     {
         var Or = new OpOr(Stream.Position);
@@ -246,6 +250,20 @@ public class Parser
         return And;
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     private Expression? ParseExpressionLv1()
     {
         Expression? newLeft = ParseExpressionLv2();
@@ -256,7 +274,6 @@ public class Parser
         }
         return exp;
     }
-
     private Expression? ParseExpressionLv1_(Expression? left)
     {
         Expression? exp = ParseAdd(left);
@@ -267,13 +284,11 @@ public class Parser
 
         return left;
     }
-
     private Expression? ParseExpressionLv2()
     {
         Expression? newLeft = ParseExpressionLv3();
         return ParseExpressionLv2_(newLeft);
     }
-
     private Expression? ParseExpressionLv2_(Expression? left)
     {
         Expression? exp = ParseMul(left);
@@ -295,7 +310,6 @@ public class Parser
         if (exp != null) return exp;
         return left;
     }
-
     private Expression? ParseExpressionLv4()
     {
         Expression? exp = ParseNumber();
@@ -324,6 +338,12 @@ public class Parser
         return null;
     }
 
+
+
+
+
+
+
     private Expression? ParseFunctionReference()
     {
         if (!Stream.IsToken(TiposDToken.Identificador) || !FunctionScope.ContainsFunction(Stream.CurrentToken().StringToken)) return null;
@@ -348,6 +368,27 @@ public class Parser
         Stream.NextToken();//revisar
         return Arguments;
     }
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     private Expression? ParseAdd(Expression? left)
     {
@@ -367,7 +408,6 @@ public class Parser
 
         return ParseExpressionLv1_(sum);
     }
-
     private Expression? ParseSub(Expression? left)
     {
         Sub sub = new Sub(Stream.Position);
@@ -386,7 +426,6 @@ public class Parser
 
         return ParseExpressionLv1_(sub);
     }
-
     private Expression? ParseMul(Expression? left)
     {
         Mul mul = new Mul(Stream.Position);
@@ -405,7 +444,6 @@ public class Parser
 
         return ParseExpressionLv2_(mul);
     }
-
     private Expression? ParseDiv(Expression? left)
     {
         Div div = new Div(Stream.Position);
@@ -440,7 +478,6 @@ public class Parser
 
         return ParseExpressionLv3_(pot);
     }
-
     private Expression? ParseNumber()
     {
         if (Stream.IsToken(TiposDToken.Number))
@@ -479,7 +516,6 @@ public class Parser
         }
         return null;
     }
-
     private Expression? ParseCoseno()
     {
         if (Stream.IsToken(TiposDToken.Coseno))
@@ -536,7 +572,6 @@ public class Parser
         }
         return null;
     }
-
     private Expression? ParsePI()
     {
         if (Stream.IsToken(TiposDToken.NumberPI))
@@ -549,7 +584,6 @@ public class Parser
         }
         return null;
     }
-
     private Expression? ParseLog()
     {
         if (Stream.IsToken(TiposDToken.Logaritmo))
@@ -579,7 +613,6 @@ public class Parser
         }
         return null;
     }
-
     private Expression? ParseVariableReference()
     {
         if (Stream.IsToken(TiposDToken.Identificador) && DefVariables.ContainsVariable(Stream.CurrentToken().StringToken))
@@ -588,7 +621,7 @@ public class Parser
         }
         return null;
     }
-
+   
 }
 
 
