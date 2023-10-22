@@ -49,7 +49,7 @@ public class Parser
 
         Stream.NextToken();
 
-        function.Body = ParseExpression();
+        function.Body = ParseStament();
         return function;
 
     }
@@ -318,10 +318,12 @@ public class Parser
         exp = ParsePI();
         if (exp != null) return exp;
 
-        exp = ParseVariableReference();
-        if (exp != null) return exp;
+       
 
         exp = ParseFunctionReference();
+        if (exp != null) return exp;
+
+        exp = ParseVariableReference();
         if (exp != null) return exp;
 
         exp = ParseCoseno();
@@ -351,7 +353,7 @@ public class Parser
         var function = FunctionScope.GetFunction(Stream.CurrentToken().StringToken);
         if (!Stream.FindToken(TiposDToken.OpenParentesis)) return null;
         var arguments = ParseArgumentsFunc();
-        return function.Invoke(arguments, DefVariables);
+        return function.Invoke(arguments);
 
     }
     private List<Expression> ParseArgumentsFunc()
@@ -394,7 +396,7 @@ public class Parser
     {
         Add sum = new Add(Stream.Position);
 
-        if (left == null || !Stream.FindToken(TiposDToken.OpSuma)) return null;
+        if (  !Stream.FindToken(TiposDToken.OpSuma)) return null;
 
         sum.Left = left;
         Stream.NextToken();
@@ -430,7 +432,7 @@ public class Parser
     {
         Mul mul = new Mul(Stream.Position);
 
-        if (left == null || !Stream.FindToken(TiposDToken.OpMultiply)) return null;
+        if (!Stream.FindToken(TiposDToken.OpMultiply)) return null;
 
         mul.Left = left;
         Stream.NextToken();
@@ -615,7 +617,7 @@ public class Parser
     }
     private Expression? ParseVariableReference()
     {
-        if (Stream.IsToken(TiposDToken.Identificador) && DefVariables.ContainsVariable(Stream.CurrentToken().StringToken))
+        if (Stream.IsToken(TiposDToken.Identificador))
         {
             return new VariableReference(Stream.CurrentToken().StringToken, DefVariables, Stream.Position);
         }
@@ -657,6 +659,43 @@ public class VariableScope
     }
 
     public bool ContainsVariable(string identifier)
+    {
+        return variables.ContainsKey(identifier);
+    }
+}
+
+public static class FunctionVariableScope
+{
+    public static Dictionary<string, object> variables = new Dictionary<string, object>();
+
+    public static void AddVariable(string identifier, object value)
+    {
+        variables.Add(identifier, value);
+    }
+
+    public static void AssignVariable(string identifier, object value)
+    {
+        variables[identifier] = value;
+    }
+
+    public static void ClearVariables()
+    {
+        variables.Clear();
+    }
+
+    public static object GetVariableValue(string identifier)
+    {
+        if (variables.ContainsKey(identifier))
+        {
+            return variables[identifier];
+        }
+        else
+        {
+            throw new Exception($"Semantic error: Variable '{identifier}' does not exist.");///ver
+        }
+    }
+
+    public  static bool ContainsVariable(string identifier)
     {
         return variables.ContainsKey(identifier);
     }

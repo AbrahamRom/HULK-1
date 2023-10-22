@@ -134,9 +134,9 @@ namespace ClassLibrary1
         {
             get
             {
-                if (VariableScope.ContainsVariable(Identifier))
+                if (FunctionVariableScope.ContainsVariable(Identifier))
                 {
-                    return VariableScope.GetVariableValue(Identifier);
+                    return FunctionVariableScope.GetVariableValue(Identifier);
                 }
                 else
                 {

@@ -20,7 +20,7 @@ namespace ClassLibrary1
 
     public class PrintStatementNode : StatementNode
     {
-        public Expression? InsideParentesis { get; }
+        public object? InsideParentesis { get; }
 
         public PrintStatementNode(int Location, Expression? insideof) : base(Location)
         {
@@ -96,7 +96,7 @@ namespace ClassLibrary1
     {
         public string Identifier { get; set; }
         public List<string> Parameters { get; set; }
-        public Expression? Body { get; set; }
+        public StatementNode? Body { get; set; }
 
         public FunctionDeclarationNode(int Location) : base(Location)
         {
@@ -126,7 +126,7 @@ namespace ClassLibrary1
     public class FunctionDefinition
     {
         public List<string> Parameters { get; set; }
-        public Expression? Body { get; set; }
+        public StatementNode? Body { get; set; }
 
         public FunctionDefinition() { }
 
@@ -135,7 +135,7 @@ namespace ClassLibrary1
         //    this.Parameters.Add(parameter);
         //}
 
-        public Expression? Invoke(List<Expression> arguments, VariableScope variables)
+        public Expression? Invoke(List<Expression> arguments)
         {
             if (arguments.Count != Parameters.Count)
             {
@@ -149,12 +149,12 @@ namespace ClassLibrary1
                 Expression argument = arguments[i];
                 argument.Evaluate();
                 var value = argument.Value;
-                variables.AddVariable(parameter, value);
+                FunctionVariableScope.AddVariable(parameter, value);
             }
 
             // Ejecuta el cuerpo de la función
-            Body.Evaluate();
-
+              Body.Evaluate();
+            var bo = Body;
             return Body;
             //// Obtiene el valor de retorno de la función
             //var returnValue = VariableScope.GetVariableValue(FunctionScope.ReturnVariable);
