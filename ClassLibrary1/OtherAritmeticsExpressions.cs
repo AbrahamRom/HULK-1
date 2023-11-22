@@ -120,32 +120,88 @@ namespace ClassLibrary1
 
     public class VariableReference : AtomExpression
     {
-        public VariableReference(string identifier,VariableScope variables,int Location) : base(Location)
+        public VariableReference(string identifier, VariableScope variables, bool IsFunct, int Location) : base(Location)
         {
             this.Identifier = identifier;
-            VariableScope = variables;
+            this.IsFunction = IsFunct;
+            if (IsFunct)
+            {
+                if (FunctionVariableScope.variables.Count == 0)
+                {
+                    var x = new VariableScope();
+                    FunctionVariableScope.variables.Push(x);
+                }
+                VariableScope = FunctionVariableScope.variables.Peek();
+                if (VariableScope.ContainsVariable(Identifier)) valor = VariableScope.GetVariableValue(Identifier);
+            }
+            else VariableScope = variables;
+
         }
         public string Identifier { get; set; }
+          public bool IsFunction { get; set; }
 
-       public override ExpressionType Type { get; set; }
+        public override ExpressionType Type { get; set; }
         public VariableScope VariableScope { get; set; }
+
+        public object? valor = null;
 
         public override object? Value
         {
             get
             {
-                if (FunctionVariableScope.ContainsVariable(Identifier))
+                //if (valor == null)
+                // {
+                if (VariableScope.ContainsVariable(Identifier))
                 {
-                    return FunctionVariableScope.GetVariableValue(Identifier);
+                    object x;
+                    if (IsFunction)
+                    {
+                        x=FunctionVariableScope.variables.Peek().GetVariableValue(Identifier);
+                    }
+                    else { x = VariableScope.GetVariableValue(Identifier); }
+                     
+                    return x;// VariableScope.GetVariableValue(Identifier);
+                }
+                //else if (FunctionScope.ContainsFunction(Identifier))
+                //{
+                //    return FunctionScope.GetFunction;
+                //}
+                else if (FunctionVariableScope.variables.Count()!=0)
+                {
+                    FunctionVariableScope.variables.Pop();
+                    return this.Value;
                 }
                 else
                 {
-                    throw new Exception($"Semantic error: Variable '{Identifier}' does not exist.");
+                   throw new Exception($"Semantic error: Variable '{Identifier}' does not exist.");
                 }
+
+                // }
+
+                //  return valor;
             }
             set { }
         }
 
     }
+    public class FunctionReference : AtomExpression
+    {
+        public FunctionReference(int Location) : base(Location) { }
+        public string Identifier { get; set; }
+        public FunctionDefinition Definition { get; set; }
+        public List<Expression> arguments;
+        public override ExpressionType Type { get; set; }
+        public override void Evaluate()
+        {
+            Definition = FunctionScope.GetFunction(Identifier);
+            Value = Definition.Invoke(arguments);
+        }
+
+        public override object? Value { get; set; }
+
+
+    }
+
+
 
 }

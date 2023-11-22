@@ -7,11 +7,11 @@ namespace Hulk_Interface
         {
             while (true)
             {
-             Console.Write(">");              
+                Console.Write(">");
                 string code = Console.ReadLine();
                 if (string.IsNullOrWhiteSpace(code)) return;
                 var errors = new List<CompilingError>();
-                var lexer = new Lexer(code,errors);
+                var lexer = new Lexer(code, errors);
                 if (errors.Count > 0)
                 {
                     foreach (var error in errors)
@@ -20,8 +20,8 @@ namespace Hulk_Interface
                     }
                     return;
                 }
-                
-               var TokenizedCode = lexer.ArrayObjectToken;
+
+                var TokenizedCode = lexer.ArrayObjectToken;
                 //foreach (var Token in TokenizedCode)
                 //{
                 //    Console.WriteLine(Token.StringToken);

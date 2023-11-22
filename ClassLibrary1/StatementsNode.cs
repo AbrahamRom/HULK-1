@@ -20,7 +20,7 @@ namespace ClassLibrary1
 
     public class PrintStatementNode : StatementNode
     {
-        public object? InsideParentesis { get; }
+        public Expression? InsideParentesis { get; }
 
         public PrintStatementNode(int Location, Expression? insideof) : base(Location)
         {
@@ -76,17 +76,17 @@ namespace ClassLibrary1
             this.Location = Location;
         }
 
-        public override void Execute()
+        public override object? Execute()
         {
             Condition.Evaluate();
             var conditionValue = Condition.Value;
             if (Convert.ToBoolean(conditionValue))
             {
-                IfBody.Execute();
+                return IfBody.Execute();
             }
             else
             {
-                ElseBody.Execute();
+                return ElseBody.Execute();
             }
         }
         public override bool CheckSemantic(Context context, Scope scope, List<CompilingError> errors) => true;
@@ -104,14 +104,16 @@ namespace ClassLibrary1
         }
 
 
-        public override void Execute()
+        public override object? Execute()
         {
             var function = new FunctionDefinition();
             function.Parameters = Parameters;
             function.Body = Body;
+            FunctionScope.AddFunctName(Identifier);
             FunctionScope.AddFunction(Identifier, function);
             //return Identifier; // Devuelve el nombre de la función declarada
             Console.WriteLine(Identifier);
+            return null;
         }
 
         public void AddParameter(string parameter)
@@ -128,14 +130,11 @@ namespace ClassLibrary1
         public List<string> Parameters { get; set; }
         public StatementNode? Body { get; set; }
 
+        //public VariableScope VariablesInFuntion { get; set; }
+
         public FunctionDefinition() { }
 
-        //public void AddParameter(string parameter)
-        //{
-        //    this.Parameters.Add(parameter);
-        //}
-
-        public Expression? Invoke(List<Expression> arguments)
+        public object? Invoke(List<Expression> arguments)
         {
             if (arguments.Count != Parameters.Count)
             {
@@ -145,22 +144,38 @@ namespace ClassLibrary1
             // Establece los valores de los argumentos en el ámbito de variables
             for (int i = 0; i < Parameters.Count; i++)
             {
+
                 string parameter = Parameters[i];
                 Expression argument = arguments[i];
                 argument.Evaluate();
                 var value = argument.Value;
-                FunctionVariableScope.AddVariable(parameter, value);
+                if (FunctionVariableScope.variables.Count == 0)
+                {
+                    var x = new VariableScope();
+                    FunctionVariableScope.variables.Push(x);
+                }
+                //if (!FunctionVariableScope.ContainsVariable(parameter))
+                //{
+                    FunctionVariableScope.AddVariable(parameter, value);//error
+                //}
             }
 
+            object? exp = Body.Execute();
+
+            // Limpia las variables del ámbito de variables
+            // FunctionVariableScope.ClearVariables();
+            //agregar pop
+            FunctionVariableScope.variables.Pop();
+            return exp;
+
             // Ejecuta el cuerpo de la función
-              Body.Evaluate();
-            var bo = Body;
-            return Body;
+            //  Body.Evaluate();
+            //var bo = Body;
+            //return Body;
             //// Obtiene el valor de retorno de la función
             //var returnValue = VariableScope.GetVariableValue(FunctionScope.ReturnVariable);
 
-            //// Limpia las variables del ámbito de variables
-            //VariableScope.ClearVariables();
+
 
             //return returnValue;
         }
@@ -168,14 +183,40 @@ namespace ClassLibrary1
 
     }
 
+    public class ExpStatement : StatementNode
+    {
+        public Expression? exp { get; }
+        public ExpStatement(int Location, Expression? exp) : base(Location)
+        {
+            this.Location = Location;
+            this.exp = exp;
+        }
+
+        public override object? Execute()
+        {
+            exp.Evaluate();
+            var x = exp.Value;
+            return x;
+        }
+        public override bool CheckSemantic(Context context, Scope scope, List<CompilingError> errors) => true;
+    }
+
     public static class FunctionScope
     {
         public static Dictionary<string, FunctionDefinition> functions = new Dictionary<string, FunctionDefinition>();
         //  public static string ReturnVariable { get; } = "__return__";
+        public static List<string> Identificadores = new List<string>();
 
         public static void AddFunction(string identifier, FunctionDefinition function)
         {
             functions.Add(identifier, function);
+        }
+        public static void AddFunctName(string iden)
+        {
+            if (!Identificadores.Contains(iden))
+            {
+                Identificadores.Add(iden);
+            }
         }
 
         public static FunctionDefinition GetFunction(string identifier)
@@ -194,5 +235,16 @@ namespace ClassLibrary1
         {
             return functions.ContainsKey(identifier);
         }
+        public static bool ContainsFunctName(string identifier)
+        {
+            return Identificadores.Contains(identifier);
+        }
+    }
+    class FunctionScopeTry
+    {
+        public static Dictionary<string, FunctionDeclarationNode> Functions = new Dictionary<string, FunctionDeclarationNode>();
+
+        public static Dictionary<string, object> Variables = new Dictionary<string, object>();
+
     }
 }

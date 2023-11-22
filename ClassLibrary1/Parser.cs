@@ -8,6 +8,7 @@ public class Parser
     }
     public TokenStream Stream { get; private set; }
     public VariableScope DefVariables { get; private set; }
+    public bool ParsingAFunction { get; private set; }
     public StatementNode? ParseStament()
     {
         StatementNode? Statement = ParsePrint();
@@ -27,6 +28,9 @@ public class Parser
             if (Statement != null) return Statement;
         }
 
+        Statement = ParseExpStatement();
+        if (Statement != null) return Statement;
+
         return null;
     }
     private StatementNode? ParseFunctionDeclaration()
@@ -35,6 +39,7 @@ public class Parser
         var function = new FunctionDeclarationNode(Stream.Position - 3);
         if (!Stream.FindToken(TiposDToken.Identificador)) return null;
         function.Identifier = Stream.CurrentToken().StringToken;
+        FunctionScope.AddFunctName(Stream.CurrentToken().StringToken);
         if (!Stream.FindToken(TiposDToken.OpenParentesis)) return null;
 
         int count = 1;
@@ -47,9 +52,11 @@ public class Parser
         if (!Stream.FindToken(TiposDToken.CloseParentesis)) return null;
         if (!Stream.FindToken(TiposDToken.FunctionDef)) return null;
 
-        Stream.NextToken();
 
+        Stream.NextToken();
+        ParsingAFunction = true;
         function.Body = ParseStament();
+        ParsingAFunction = false;
         return function;
 
     }
@@ -95,6 +102,12 @@ public class Parser
             if (!Stream.FindToken(TiposDToken.Coma)) count = 0;
 
         }
+    }
+    private StatementNode? ParseExpStatement()
+    {
+        var exp = ParseExpression();
+        if (exp == null) return null;
+        return new ExpStatement(Stream.Position, exp);
     }
 
 
@@ -318,9 +331,12 @@ public class Parser
         exp = ParsePI();
         if (exp != null) return exp;
 
-       
+
 
         exp = ParseFunctionReference();
+        if (exp != null) return exp;
+
+        exp = ParseFunctionRecRef();
         if (exp != null) return exp;
 
         exp = ParseVariableReference();
@@ -340,20 +356,26 @@ public class Parser
         return null;
     }
 
+    private Expression? ParseFunctionRecRef()
+    {
+        if (!Stream.IsToken(TiposDToken.Identificador) || !FunctionScope.ContainsFunctName(Stream.CurrentToken().StringToken)) return null;
+        var funct = new FunctionReference(Stream.Position);
+        funct.Identifier = Stream.CurrentToken().StringToken;
+        if (!Stream.FindToken(TiposDToken.OpenParentesis)) return null;
+        var arguments = ParseArgumentsFunc();
+        funct.arguments = arguments;
 
+        return funct;
+    }
 
-
-
-
-
-    private Expression? ParseFunctionReference()
+    public Expression? ParseFunctionReference()
     {
         if (!Stream.IsToken(TiposDToken.Identificador) || !FunctionScope.ContainsFunction(Stream.CurrentToken().StringToken)) return null;
         var identificador = Stream.CurrentToken().StringToken;
         var function = FunctionScope.GetFunction(Stream.CurrentToken().StringToken);
         if (!Stream.FindToken(TiposDToken.OpenParentesis)) return null;
         var arguments = ParseArgumentsFunc();
-        return function.Invoke(arguments);
+        return ConvertObjToExp(function.Invoke(arguments));
 
     }
     private List<Expression> ParseArgumentsFunc()
@@ -370,7 +392,15 @@ public class Parser
         Stream.NextToken();//revisar
         return Arguments;
     }
-   
+
+    private Expression? ConvertObjToExp(object? obj)
+    {
+        if (obj is bool) return new Boolean((bool)obj, Stream.Position);
+        if (obj is double) return new Number((double)obj, Stream.Position);
+        if (obj is string) return new StringLiteral((string)obj, Stream.Position);
+        return null;
+    }
+
 
 
 
@@ -396,7 +426,7 @@ public class Parser
     {
         Add sum = new Add(Stream.Position);
 
-        if (  !Stream.FindToken(TiposDToken.OpSuma)) return null;
+        if (!Stream.FindToken(TiposDToken.OpSuma)) return null;
 
         sum.Left = left;
         Stream.NextToken();
@@ -619,11 +649,11 @@ public class Parser
     {
         if (Stream.IsToken(TiposDToken.Identificador))
         {
-            return new VariableReference(Stream.CurrentToken().StringToken, DefVariables, Stream.Position);
+            return new VariableReference(Stream.CurrentToken().StringToken, DefVariables, ParsingAFunction, Stream.Position);
         }
         return null;
     }
-   
+
 }
 
 
@@ -664,40 +694,52 @@ public class VariableScope
     }
 }
 
-public static class FunctionVariableScope
+public class FunctionVariableScope
 {
-    public static Dictionary<string, object> variables = new Dictionary<string, object>();
+    public static Stack<VariableScope> variables = new Stack<VariableScope>();
+    // public static VariableScope variables = new VariableScope();
 
     public static void AddVariable(string identifier, object value)
     {
-        variables.Add(identifier, value);
-    }
-
-    public static void AssignVariable(string identifier, object value)
-    {
-        variables[identifier] = value;
-    }
-
-    public static void ClearVariables()
-    {
-        variables.Clear();
-    }
-
-    public static object GetVariableValue(string identifier)
-    {
-        if (variables.ContainsKey(identifier))
+        // variables.Add(identifier, value);
+        if (!variables.Peek().ContainsVariable(identifier))
         {
-            return variables[identifier];
+            variables.Peek().AddVariable(identifier, value);
         }
         else
         {
-            throw new Exception($"Semantic error: Variable '{identifier}' does not exist.");///ver
+            var NewVarScope = new VariableScope();
+            NewVarScope.variables.Add(identifier, value);
+            variables.Push(NewVarScope);
         }
+        // variables.variables[identifier] = value;
     }
 
-    public  static bool ContainsVariable(string identifier)
+    //public static void AssignVariable(string identifier, object value)
+    //{
+    //    variables.variables[identifier] = value;
+    //}
+
+    //public static void ClearVariables()
+    //{
+    //    variables.varClear();
+    //}
+
+    //public static object GetVariableValue(string identifier)
+    //{
+    //    if (variables.ContainsVariable(identifier))
+    //    {
+    //        return variables.GetVariableValue(identifier);
+    //    }
+    //    else
+    //    {
+    //        throw new Exception($"Semantic error: Variable '{identifier}' does not exist.");///ver
+    //    }
+    //}
+
+    public static bool ContainsVariable(string identifier)
     {
-        return variables.ContainsKey(identifier);
+        return variables.Peek().ContainsVariable(identifier);
     }
 }
 
