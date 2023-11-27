@@ -21,6 +21,7 @@ public class Div : BinaryExpression
         Right!.Evaluate();
         double y = (double)Right.Value!;
         if (y==0) throw new Exception("! SEMANTIC ERROR : Cannot divide by zero");
+        CheckTypes("/", Left.Type, Right.Type);
         Value = x / y;
     }
 

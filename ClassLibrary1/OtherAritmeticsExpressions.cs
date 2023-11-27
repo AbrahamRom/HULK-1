@@ -28,6 +28,7 @@ namespace ClassLibrary1
             Right!.Evaluate();
             double y = (double)Right.Value!;
             if (x == 0 && y == 0) throw new Exception($"!SEMANTIC ERROR : {x} pow to {y} is not defined");
+            CheckTypes("^", Left.Type, Right.Type);
             Value = Math.Pow(x,y);
         }
 
@@ -121,7 +122,8 @@ namespace ClassLibrary1
         double x = (double)Left.Value!;
         Right!.Evaluate();
         double y = (double)Right.Value!;
-        Value = Math.Log(x, y);
+            CheckTypes("log", Left.Type, Right.Type);
+            Value = Math.Log(x, y);
         }
 
         public override string? ToString()
@@ -197,7 +199,7 @@ namespace ClassLibrary1
                 }
                 else
                 {
-                   throw new Exception($"Semantic error: Variable '{Identifier}' does not exist.");
+                    throw new Exception($"! SEMANTIC ERROR : Undefine variable {Identifier}");
                 }
 
                 // }

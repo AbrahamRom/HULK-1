@@ -30,7 +30,7 @@ namespace ClassLibrary1
                 ArrayObjectToken[indexador] = x;
                 if (x.TipoDToken == TiposDToken.InvalidToken)
                 {
-                    errors.Add(new CompilingError(match.Index, ErrorCode.Invalid, "Token"));
+                    throw new Exception($"! LEXICAL ERROR : '{x.ToString()}' is not a valid token");
                 }
                 indexador++;
                 match = match.NextMatch();

@@ -671,7 +671,11 @@ public class VariableScope
 
     public void AddVariable(string identifier, object value)
     {
-        variables.Add(identifier, value);
+        if (!variables.ContainsKey(identifier))
+        {
+            variables.Add(identifier, value);
+        }
+        else throw new Exception($"! SEMANTIC ERROR : A parameter with the name '{identifier}' already exists insert another parameter name");
     }
 
     public void AssignVariable(string identifier, object value)

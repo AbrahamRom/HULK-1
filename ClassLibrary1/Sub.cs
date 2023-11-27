@@ -19,6 +19,7 @@ public class Sub : BinaryExpression
         double x = (double)Left.Value!;
         Right!.Evaluate();
         double y = (double)Right.Value!;
+        CheckTypes("-", Left.Type, Right.Type);
         Value = x - y;
     }
 

@@ -218,7 +218,11 @@ namespace ClassLibrary1
 
         public static void AddFunction(string identifier, FunctionDefinition function)
         {
-            functions.Add(identifier, function);
+            if (!functions.ContainsKey(identifier))
+            {
+                functions.Add(identifier, function);
+            }
+            else throw new Exception($"! SEMANTIC ERROR : Function {identifier} is already defined");
         }
         public static void AddFunctName(string iden)
         {

@@ -1,7 +1,7 @@
 
 public abstract class BinaryExpression : Expression
 {
-    public BinaryExpression(int Location) : base(Location){}
+    public BinaryExpression(int Location) : base(Location) { }
 
     public Expression? Left { get; set; }
 
@@ -26,6 +26,16 @@ public abstract class BinaryExpression : Expression
         }
         return left && right;
     }
+    public static void CheckTypes(string operation, ExpressionType left, ExpressionType right)
+    {
+        if (!(left == ExpressionType.Anytype || right == ExpressionType.Anytype))
+        {
+            if (left != right)
+            {
+                throw new Exception($"!SEMANTIC ERROR : Invalid expression: Can't operate {left} with {right} using {operation}");
+            }
+        }
+    }
 
     //public override bool CheckSemantic(Context context, Scope scope, List<CompilingError> errors)
     //{
@@ -45,15 +55,19 @@ public abstract class BinaryExpression : Expression
 }
 public class OpAnd : BinaryExpression
 {
-   
+
     public override object? Value { get; set; }
 
     public OpAnd(int Location) : base(Location) { }
 
     public override void Evaluate()
     {
-        Left.Evaluate(); Right.Evaluate();
-        Value = ((bool)Left.Value! && (bool)Right.Value!);
+        Left.Evaluate();
+        bool x = (bool)Left.Value!;
+        Right.Evaluate();
+        bool y = (bool)Left.Value!;
+        CheckTypes("&", Left.Type, Right.Type);
+        Value = x && y;
     }
     public override ExpressionType Type
     {
@@ -73,8 +87,12 @@ public class OpOr : BinaryExpression
 
     public override void Evaluate()
     {
-        Left.Evaluate(); Right.Evaluate();
-        Value = ((bool)Left.Value! || (bool)Right.Value!);
+        Left.Evaluate();
+        bool x = (bool)Left.Value!;
+        Right.Evaluate();
+        bool y = (bool)Left.Value!;
+        CheckTypes("|", Left.Type, Right.Type);
+        Value = x || y;
     }
     public override ExpressionType Type
     {
@@ -86,72 +104,72 @@ public class OpOr : BinaryExpression
     }
 }
 
-    public class Igualdad : BinaryExpression
+public class Igualdad : BinaryExpression
+{
+
+    public override object? Value { get; set; }
+
+    public Igualdad(int Location) : base(Location) { }
+
+
+    public override void Evaluate()
     {
-
-        public override object? Value { get; set; }
-
-        public Igualdad(int Location) : base(Location) { }
-
-
-        public override void Evaluate()
-        {
-            Left.Evaluate(); Right.Evaluate();
-            Value = ((double)Left.Value! == (double)Right.Value!);
-        }
-
-        public override ExpressionType Type
-        {
-            get
-            {
-                return ExpressionType.Boolean;
-            }
-            set { }
-        }
+        Left.Evaluate(); Right.Evaluate();
+        Value = ((double)Left.Value! == (double)Right.Value!);
     }
-    public class Mayor : BinaryExpression
+
+    public override ExpressionType Type
     {
-
-        public override object? Value { get; set; }
-
-        public Mayor(int Location) : base(Location) { }
-
-
-        public override void Evaluate()
+        get
         {
-            Left.Evaluate(); Right.Evaluate();
-            Value = (bool)((double)Left.Value! > (double)Right.Value!);
+            return ExpressionType.Boolean;
         }
-
-        public override ExpressionType Type
-        {
-            get
-            {
-                return ExpressionType.Boolean;
-            }
-            set { }
-        }
+        set { }
     }
-    public class Menor : BinaryExpression
+}
+public class Mayor : BinaryExpression
+{
+
+    public override object? Value { get; set; }
+
+    public Mayor(int Location) : base(Location) { }
+
+
+    public override void Evaluate()
     {
-
-        public override object? Value { get; set; }
-
-        public Menor(int Location) : base(Location) { }
-
-
-        public override void Evaluate()
-        {
-            Left.Evaluate(); Right.Evaluate();
-            Value = (bool)((double)Left.Value! < (double)Right.Value!);
-        }
-
-        public override ExpressionType Type
-        {
-            get
-            {
-                return ExpressionType.Boolean;
-            }
-            set { }
-        }
+        Left.Evaluate(); Right.Evaluate();
+        Value = (bool)((double)Left.Value! > (double)Right.Value!);
     }
+
+    public override ExpressionType Type
+    {
+        get
+        {
+            return ExpressionType.Boolean;
+        }
+        set { }
+    }
+}
+public class Menor : BinaryExpression
+{
+
+    public override object? Value { get; set; }
+
+    public Menor(int Location) : base(Location) { }
+
+
+    public override void Evaluate()
+    {
+        Left.Evaluate(); Right.Evaluate();
+        Value = (bool)((double)Left.Value! < (double)Right.Value!);
+    }
+
+    public override ExpressionType Type
+    {
+        get
+        {
+            return ExpressionType.Boolean;
+        }
+        set { }
+    }
+}
