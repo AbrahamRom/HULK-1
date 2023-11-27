@@ -129,8 +129,8 @@ public class Parser
         var exp = ParseExpressionBoolean();
         if (exp != null )
         {
-           // exp.Evaluate();
-            if ((exp.Type==ExpressionType.Boolean))
+            // exp.Evaluate();
+            if ((exp.Type == ExpressionType.Boolean))
             {
                 return exp;
             }
@@ -706,9 +706,14 @@ public class FunctionVariableScope
 {
     public static Stack<VariableScope> variables = new Stack<VariableScope>();
     // public static VariableScope variables = new VariableScope();
-
+    public static int CountOverFlow { get; set; }
     public static void AddVariable(string identifier, object value)
     {
+        if (CountOverFlow > 1000)
+        {
+            throw new Exception("!OVERFLOW ERROR : Hulk Stack overflow");
+        }
+        else CountOverFlow++;
         // variables.Add(identifier, value);
         if (!variables.Peek().ContainsVariable(identifier))
         {

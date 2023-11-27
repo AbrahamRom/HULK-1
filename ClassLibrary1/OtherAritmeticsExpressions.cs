@@ -27,6 +27,7 @@ namespace ClassLibrary1
             double x = (double)Left.Value!;
             Right!.Evaluate();
             double y = (double)Right.Value!;
+            if (x == 0 && y == 0) throw new Exception($"!SEMANTIC ERROR : {x} pow to {y} is not defined");
             Value = Math.Pow(x,y);
         }
 
@@ -225,6 +226,7 @@ namespace ClassLibrary1
         {
             Definition = FunctionScope.GetFunction(Identifier);
             Value = Definition.Invoke(arguments);
+            
         }
 
         public override object? Value { get; set; }

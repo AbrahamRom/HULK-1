@@ -80,6 +80,7 @@ namespace ClassLibrary1
         {
             Condition.Evaluate();
             var conditionValue = Condition.Value;
+            if (conditionValue == null) throw new Exception("! SEMANTIC ERROR : If-ELSE expressions must have a boolean condition");
             if (Convert.ToBoolean(conditionValue))
             {
                 return IfBody.Execute();
@@ -107,6 +108,7 @@ namespace ClassLibrary1
         public override object? Execute()
         {
             var function = new FunctionDefinition();
+            function.FunctionName = Identifier;
             function.Parameters = Parameters;
             function.Body = Body;
             FunctionScope.AddFunctName(Identifier);
@@ -127,6 +129,7 @@ namespace ClassLibrary1
 
     public class FunctionDefinition
     {
+        public string FunctionName { get; set; }
         public List<string> Parameters { get; set; }
         public StatementNode? Body { get; set; }
 
@@ -138,7 +141,7 @@ namespace ClassLibrary1
         {
             if (arguments.Count != Parameters.Count)
             {
-                throw new Exception($"Semantic error: Function '{Parameters[0]}' receives {Parameters.Count} argument(s), but {arguments.Count} were given.");
+                throw new Exception($"!SEMANTIC ERROR : Function {FunctionName} does not have {arguments.Count} parameters but {Parameters.Count} parameters");
             }
 
             // Establece los valores de los argumentos en el ámbito de variables
@@ -166,6 +169,12 @@ namespace ClassLibrary1
             // FunctionVariableScope.ClearVariables();
             //agregar pop
             FunctionVariableScope.variables.Pop();
+
+            if (FunctionVariableScope.variables.Count() == 0 && FunctionVariableScope.CountOverFlow > 0)
+            {
+                Console.WriteLine(exp.ToString());
+            }
+
             return exp;
 
             // Ejecuta el cuerpo de la función
@@ -227,7 +236,7 @@ namespace ClassLibrary1
             }
             else
             {
-                throw new Exception($"Semantic error: Function '{identifier}' does not exist.");
+                throw new Exception($"!SEMANTIC ERROR : Function {identifier} is not defined");
             }
         }
 
