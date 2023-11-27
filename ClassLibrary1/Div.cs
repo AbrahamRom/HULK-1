@@ -3,16 +3,25 @@ public class Div : BinaryExpression
 {
     public Div(int Location) : base(Location) { }
 
-    public override ExpressionType Type {get; set;}
+    public override ExpressionType Type
+    {
+        get
+        {
+            return ExpressionType.Number;
+        }
+        set { }
+    }
 
     public override object? Value {get; set;}
 
     public override void Evaluate()
     {
-        Right!.Evaluate();
         Left!.Evaluate();
-        
-        Value = (double)Left.Value! / (double)Right.Value!;
+        double x = (double)Left.Value!;
+        Right!.Evaluate();
+        double y = (double)Right.Value!;
+        if (y==0) throw new Exception("! SEMANTIC ERROR : Cannot divide by zero");
+        Value = x / y;
     }
 
     public override string? ToString()

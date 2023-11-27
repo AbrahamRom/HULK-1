@@ -240,11 +240,11 @@ namespace ClassLibrary1
             return Identificadores.Contains(identifier);
         }
     }
-    class FunctionScopeTry
-    {
-        public static Dictionary<string, FunctionDeclarationNode> Functions = new Dictionary<string, FunctionDeclarationNode>();
+    //class FunctionScopeTry
+    //{
+    //    public static Dictionary<string, FunctionDeclarationNode> Functions = new Dictionary<string, FunctionDeclarationNode>();
 
-        public static Dictionary<string, object> Variables = new Dictionary<string, object>();
+    //    public static Dictionary<string, object> Variables = new Dictionary<string, object>();
 
-    }
+    //}
 }

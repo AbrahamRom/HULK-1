@@ -3,7 +3,7 @@ using ClassLibrary1;
 public class TokenStream
 {
     public Token[] tokens;
-    int position;
+    public int position;
     public int LastToken { get; set; }
 
     public TokenStream(Token[] token)
@@ -49,6 +49,7 @@ public class TokenStream
             if (tokens[k].TipoDToken == TiposDToken.OpenParentesis) count++;
             if (tokens[k].TipoDToken == TiposDToken.CloseParentesis) count--;
         }
+        if (k == this.LastToken) throw new Exception("parentesis sin cerrar");
         return k;
     }
 

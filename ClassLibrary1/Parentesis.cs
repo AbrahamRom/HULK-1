@@ -15,7 +15,15 @@ namespace ClassLibrary1
             // exp.Evaluate();
             // exp.Value;
         }
-        public override ExpressionType Type { get; set; }
+        public override ExpressionType Type
+        {
+            get
+            {
+                if (InsideParentesis == null) return ExpressionType.Anytype;
+                else return InsideParentesis.Type;
+            }
+            set { }
+        }
 
         public override object? Value { get; set; }
         public Expression? InsideParentesis { get; set; }
@@ -35,7 +43,7 @@ namespace ClassLibrary1
             }
             else
             {
-               Value = null;
+                Value = null;
             }
 
         }
@@ -43,7 +51,7 @@ namespace ClassLibrary1
         {
             InsideParentesis.Evaluate();
             double x = (double)InsideParentesis.Value!;
-            return new Number(-1*x,Location);
+            return new Number(-1 * x, Location);
         }
     }
 }
