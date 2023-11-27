@@ -66,11 +66,6 @@ namespace Hulk_Interface
                             Console.ForegroundColor = ConsoleColor.Blue;
                             break;
                         }
-                        if (message[i] == "FUNCTION")
-                        {
-                            Console.ForegroundColor = ConsoleColor.Cyan;
-                            break;
-                        }
                     }
                     Console.WriteLine(ex.Message);
                     Console.ForegroundColor = ConsoleColor.White;
