@@ -10,16 +10,24 @@ namespace ClassLibrary1
     {
         public Potencia(int Location) : base(Location) { }
 
-        public override ExpressionType Type { get; set; }
+        public override ExpressionType Type
+        {
+            get
+            {
+                return ExpressionType.Number;
+            }
+            set { }
+        }
 
         public override object? Value { get; set; }
 
         public override void Evaluate()
         {
-            Right!.Evaluate();
             Left!.Evaluate();
-
-            Value = Math.Pow((double)Left.Value!, (double)Right.Value!);
+            double x = (double)Left.Value!;
+            Right!.Evaluate();
+            double y = (double)Right.Value!;
+            Value = Math.Pow(x,y);
         }
 
         public override string? ToString()
@@ -95,16 +103,24 @@ namespace ClassLibrary1
     {
         public Logaritmo(int Location) : base(Location) { }
 
-        public override ExpressionType Type { get; set; }
+        public override ExpressionType Type
+        {
+            get
+            {
+                return ExpressionType.Number;
+            }
+            set { }
+        }
 
         public override object? Value { get; set; }
 
         public override void Evaluate()
         {
-            Right!.Evaluate();
             Left!.Evaluate();
-
-            Value = Math.Log((double)Left.Value!, (double)Right.Value!);
+        double x = (double)Left.Value!;
+        Right!.Evaluate();
+        double y = (double)Right.Value!;
+        Value = Math.Log(x, y);
         }
 
         public override string? ToString()
@@ -140,7 +156,14 @@ namespace ClassLibrary1
         public string Identifier { get; set; }
           public bool IsFunction { get; set; }
 
-        public override ExpressionType Type { get; set; }
+        public override ExpressionType Type
+        {
+            get
+            {
+                return ExpressionType.Anytype;
+            }
+            set { }
+        }
         public VariableScope VariableScope { get; set; }
 
         public object? valor = null;
@@ -190,7 +213,14 @@ namespace ClassLibrary1
         public string Identifier { get; set; }
         public FunctionDefinition Definition { get; set; }
         public List<Expression> arguments;
-        public override ExpressionType Type { get; set; }
+        public override ExpressionType Type
+        {
+            get
+            {
+                return ExpressionType.Anytype;
+            }
+            set { }
+        }
         public override void Evaluate()
         {
             Definition = FunctionScope.GetFunction(Identifier);

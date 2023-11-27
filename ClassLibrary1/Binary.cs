@@ -17,7 +17,7 @@ public abstract class BinaryExpression : Expression
             Type = ExpressionType.ErrorType;
             return false;
         }
-        
+
         if (Right.Type != Left.Type)
         {
             errors.Add(new CompilingError(Location, ErrorCode.Invalid, "Differents Expressions Types"));
@@ -55,11 +55,18 @@ public class OpAnd : BinaryExpression
         Left.Evaluate(); Right.Evaluate();
         Value = ((bool)Left.Value! && (bool)Right.Value!);
     }
-    public override ExpressionType Type { get { return ExpressionType.Boolean; } set { } }
+    public override ExpressionType Type
+    {
+        get
+        {
+            return ExpressionType.Boolean;
+        }
+        set { }
+    }
 }
 public class OpOr : BinaryExpression
 {
-   
+
     public override object? Value { get; set; }
 
     public OpOr(int Location) : base(Location) { }
@@ -69,54 +76,82 @@ public class OpOr : BinaryExpression
         Left.Evaluate(); Right.Evaluate();
         Value = ((bool)Left.Value! || (bool)Right.Value!);
     }
-    public override ExpressionType Type { get { return ExpressionType.Boolean; } set { } }
-}
-
-public class Igualdad:BinaryExpression
-{
-  
-    public override object? Value { get; set; }
-
-    public Igualdad(int Location) : base(Location) { }
-   
-
-    public override void Evaluate()
+    public override ExpressionType Type
     {
-        Left.Evaluate(); Right.Evaluate();
-        Value =((double)Left.Value! == (double)Right.Value!);
+        get
+        {
+            return ExpressionType.Boolean;
+        }
+        set { }
     }
-
-    public override ExpressionType Type { get { return ExpressionType.Boolean; } set { } }
 }
-public class Mayor : BinaryExpression
-{
-   
-    public override object? Value { get; set; }
 
-    public Mayor(int Location) : base(Location) { }
-    
-
-    public override void Evaluate()
+    public class Igualdad : BinaryExpression
     {
-        Left.Evaluate(); Right.Evaluate();
-        Value = (bool)((double)Left.Value! > (double)Right.Value!);
+
+        public override object? Value { get; set; }
+
+        public Igualdad(int Location) : base(Location) { }
+
+
+        public override void Evaluate()
+        {
+            Left.Evaluate(); Right.Evaluate();
+            Value = ((double)Left.Value! == (double)Right.Value!);
+        }
+
+        public override ExpressionType Type
+        {
+            get
+            {
+                return ExpressionType.Boolean;
+            }
+            set { }
+        }
     }
-
-    public override ExpressionType Type { get { return ExpressionType.Boolean; } set { } }
-}
-public class Menor : BinaryExpression
-{
-   
-    public override object? Value { get; set; }
-
-    public Menor( int Location) : base(Location) { }
-   
-
-    public override void Evaluate()
+    public class Mayor : BinaryExpression
     {
-        Left.Evaluate(); Right.Evaluate();
-        Value = (bool)((double)Left.Value! < (double)Right.Value!);
-    }
 
-    public override ExpressionType Type { get { return ExpressionType.Boolean; } set { } }
-}
+        public override object? Value { get; set; }
+
+        public Mayor(int Location) : base(Location) { }
+
+
+        public override void Evaluate()
+        {
+            Left.Evaluate(); Right.Evaluate();
+            Value = (bool)((double)Left.Value! > (double)Right.Value!);
+        }
+
+        public override ExpressionType Type
+        {
+            get
+            {
+                return ExpressionType.Boolean;
+            }
+            set { }
+        }
+    }
+    public class Menor : BinaryExpression
+    {
+
+        public override object? Value { get; set; }
+
+        public Menor(int Location) : base(Location) { }
+
+
+        public override void Evaluate()
+        {
+            Left.Evaluate(); Right.Evaluate();
+            Value = (bool)((double)Left.Value! < (double)Right.Value!);
+        }
+
+        public override ExpressionType Type
+        {
+            get
+            {
+                return ExpressionType.Boolean;
+            }
+            set { }
+        }
+    }

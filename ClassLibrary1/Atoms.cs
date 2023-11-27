@@ -24,7 +24,14 @@ public class Boolean : AtomExpression
         return new Boolean(!(bool)Value!,Location-1);
     }
 
-    public override ExpressionType Type { get { return ExpressionType.Boolean; } set { } }
+    public override ExpressionType Type
+    {
+        get
+        {
+            return ExpressionType.Number;
+        }
+        set { }
+    }
 }
 public class StringLiteral : AtomExpression
 {
@@ -34,6 +41,13 @@ public class StringLiteral : AtomExpression
     {
         this.Value = value;
     }
-    public override ExpressionType Type { get { return ExpressionType.StringLiteral; } set { } }
+    public override ExpressionType Type
+    {
+        get
+        {
+            return ExpressionType.Number;
+        }
+        set { }
+    }
 }
 
