@@ -1,4 +1,4 @@
-
+// representacion de las expresiones binarias
 public abstract class BinaryExpression : Expression
 {
     public BinaryExpression(int Location) : base(Location) { }
@@ -26,7 +26,7 @@ public abstract class BinaryExpression : Expression
         }
         return left && right;
     }
-    public static void CheckTypes(string operation, ExpressionType left, ExpressionType right)
+    public static void CheckTypes(string operation, ExpressionType left, ExpressionType right) // metodo del chequeo de tipos
     {
         if (!(left == ExpressionType.Anytype || right == ExpressionType.Anytype))
         {
@@ -37,21 +37,6 @@ public abstract class BinaryExpression : Expression
         }
     }
 
-    //public override bool CheckSemantic(Context context, Scope scope, List<CompilingError> errors)
-    //{
-    //    bool right = Right!.CheckSemantic(context, scope, errors);
-    //    bool left = Left!.CheckSemantic(context, scope, errors);
-
-    //    if (Right.Type != ExpressionType.Number || Left.Type != ExpressionType.Number)
-    //    {
-    //        errors.Add(new CompilingError(location, ErrorCode.Invalid, "We don't do that here... "));
-    //        Type = ExpressionType.ErrorType;
-    //        return false;
-    //    }
-
-    //    Type = ExpressionType.Number;
-    //    return right && left;
-    //}
 }
 public class OpAnd : BinaryExpression
 {
@@ -61,7 +46,7 @@ public class OpAnd : BinaryExpression
     public OpAnd(int Location) : base(Location) { }
 
     public override void Evaluate()
-    {
+    {                                                                        //operador &&
         Left.Evaluate();
         bool x = (bool)Left.Value!;
         Right.Evaluate();
@@ -83,7 +68,7 @@ public class OpOr : BinaryExpression
 
     public override object? Value { get; set; }
 
-    public OpOr(int Location) : base(Location) { }
+    public OpOr(int Location) : base(Location) { }                              //operador ||
 
     public override void Evaluate()
     {
@@ -109,7 +94,7 @@ public class Igualdad : BinaryExpression
 
     public override object? Value { get; set; }
 
-    public Igualdad(int Location) : base(Location) { }
+    public Igualdad(int Location) : base(Location) { }                             //operador ==
 
 
     public override void Evaluate()
@@ -132,7 +117,7 @@ public class Mayor : BinaryExpression
 
     public override object? Value { get; set; }
 
-    public Mayor(int Location) : base(Location) { }
+    public Mayor(int Location) : base(Location) { }                                 //operador >
 
 
     public override void Evaluate()
@@ -155,7 +140,7 @@ public class Menor : BinaryExpression
 
     public override object? Value { get; set; }
 
-    public Menor(int Location) : base(Location) { }
+    public Menor(int Location) : base(Location) { }                                       // operador <
 
 
     public override void Evaluate()

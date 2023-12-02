@@ -17,12 +17,5 @@ public class Number : AtomExpression
 
     public override object? Value { get; set; }
 
-    public bool IsInt
-    {
-        get
-        {
-            int a;
-            return int.TryParse(Value!.ToString(), out a);
-        }
-    }
+    
 }

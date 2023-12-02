@@ -14,7 +14,7 @@ public enum ExpressionType
 {
     Anytype,
     StringLiteral,
-    Number,
+    Number,                              //diferentes tipos de expresiones con las que trabajo en el codigo
     Boolean,
     ErrorType
 }

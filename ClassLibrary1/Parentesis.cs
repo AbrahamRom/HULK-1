@@ -10,10 +10,6 @@ namespace ClassLibrary1
     {
         public Parentesis(int Location) : base(Location)
         {
-            //var parser = new Parser(stream);
-            //var exp = parser.ParseExpression();
-            // exp.Evaluate();
-            // exp.Value;
         }
         public override ExpressionType Type
         {

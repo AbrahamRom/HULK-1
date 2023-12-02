@@ -18,8 +18,8 @@ public class Add : BinaryExpression
     {
         Left!.Evaluate();
         double x = (double)Left.Value!;
-        Right!.Evaluate();
-        double y = (double)Right.Value!;
+        Right!.Evaluate();                                     //debe guardarse las evaluaciones de las ramas en variables locales, de los contrario la referencia en la 
+        double y = (double)Right.Value!;                       // recursividad puede hacer que devuelve un valores erroneos en las capas mas altas de la misma
         CheckTypes("+",Left.Type,Right.Type);
         Value = x+y;
     }

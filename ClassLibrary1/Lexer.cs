@@ -13,7 +13,7 @@ namespace ClassLibrary1
        public  static Regex separador = new Regex(TokenUnion); // el regex que se usa para separar los tokens 
 
 
-        public static void InvalidToken(string input)
+        public static void InvalidToken(string input)                              // este metodo revisa si existe algun toque invalido y devuelve el error correspondiente
         {
             Regex whitespace = new Regex("\\s+");
             MatchCollection matches = separador.Matches(input);
@@ -42,7 +42,7 @@ namespace ClassLibrary1
         public Token[] ArrayObjectToken;
         // public string[] ArrayStringToken;
 
-        public Lexer(string code, List<CompilingError> errors)
+        public Lexer(string code, List<CompilingError> errors)                    // clasificas los token usando regex
         {
             InvalidToken(code);
             MatchCollection collection = separador.Matches(code);
@@ -74,7 +74,7 @@ namespace ClassLibrary1
         public int Location;
         public string StringToken;
 
-        public Token(int position, string stringtoken)
+        public Token(int position, string stringtoken) // clasificacion de los token
         {
             this.Location = position;
             this.StringToken = stringtoken;
@@ -115,7 +115,7 @@ namespace ClassLibrary1
         }
     }
 
-    public class ExpresionesRegulares
+    public class ExpresionesRegulares // manejo de los tipos de regex
     {
         static public Regex OpSuma = new Regex(@"\+");
         static public Regex OpResta = new Regex(@"\-");

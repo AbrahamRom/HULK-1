@@ -1,15 +1,15 @@
 ﻿using ClassLibrary1;
 public class Parser
 {
-    public Parser(TokenStream stream)
+    public Parser(TokenStream stream)                                //constructor de la clase los token vienen incluidos en stream
     {
         Stream = stream;
         DefVariables = new VariableScope();
     }
-    public TokenStream Stream { get; private set; }
-    public VariableScope DefVariables { get; private set; }
-    public bool ParsingAFunction { get; private set; }
-    public StatementNode? ParseStament()
+    public TokenStream Stream { get; private set; }                 //flujo de los token mientras avanza el programa
+    public VariableScope DefVariables { get; private set; }           // aqui se guardan las variables locales
+    public bool ParsingAFunction { get; private set; }               // mientas se parsea una funcion toma valor true, asi se utiliza un ambito global
+    public StatementNode? ParseStament()                    // itera tratando de parsear una un Statement
     {
         StatementNode? Statement = ParsePrint();
         if (Statement != null) return Statement;
@@ -33,7 +33,7 @@ public class Parser
 
         return null;
     }
-    private StatementNode? ParseFunctionDeclaration()
+    private StatementNode? ParseFunctionDeclaration()             // parsea una declaracion de funciion utilizando la estructura function f(x) => expression del cuerpo
     {
         if (!Stream.IsToken(TiposDToken.Function)) return null;
         var function = new FunctionDeclarationNode(Stream.Position - 3);
@@ -60,14 +60,13 @@ public class Parser
         return function;
 
     }
-    private StatementNode? ParseIfElseStatement()
+    private StatementNode? ParseIfElseStatement()             // parsea una expresion if-else 
     {
         if (!Stream.IsToken(TiposDToken.If)) return null;
         if (!Stream.FindToken(TiposDToken.OpenParentesis)) return null;
         Stream.NextToken();
         var statement = new IfStatementNode(Stream.Position - 2);
         statement.Condition = ParseExpressionBoolean();
-        //  if (!Stream.FindToken(TiposDToken.CloseParentesis)) return null;
         Stream.NextToken(2);
         statement.IfBody = ParseStament();
         if (!Stream.FindToken(TiposDToken.Else)) return null;
@@ -75,7 +74,7 @@ public class Parser
         statement.ElseBody = ParseStament();
         return statement;
     }
-    private StatementNode? ParsePrint()
+    private StatementNode? ParsePrint()                              // parsea print()
     {
         if (!Stream.IsToken(TiposDToken.Print)) return null;
         if (!Stream.FindToken(TiposDToken.OpenParentesis)) return null;
@@ -84,12 +83,12 @@ public class Parser
         var Statement = new PrintStatementNode(Stream.Position - 2, exp);
         return Statement;
     }
-    private void ParseParseVariableDeclaration()
+    private void ParseParseVariableDeclaration()                      //parsea un ambito let-in
     {
         if (!Stream.IsToken(TiposDToken.Let)) return;
         int count = 1;
         while (count == 1)
-        { // revisar si se declaran 2 variables con el mismo nombre
+        {
             if (!Stream.FindToken(TiposDToken.Identificador)) return;
             if (!Stream.FindToken(TiposDToken.Assign)) return;
             Stream.MoveBack(1);
@@ -103,34 +102,20 @@ public class Parser
 
         }
     }
-    private StatementNode? ParseExpStatement()
+    private StatementNode? ParseExpStatement()                      // convierte las expresiones en stamments de la clase heredada de StatatementNode
     {
         var exp = ParseExpression();
         if (exp == null) return null;
         return new ExpStatement(Stream.Position, exp);
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-    public Expression? ParseExpression()
+    public Expression? ParseExpression()                     // metodo general para parsear una expresion
     {
         int temp = Stream.Position;
         var exp = ParseExpressionBoolean();
-        if (exp != null )
+        if (exp != null)
         {
-            // exp.Evaluate();
-            if ((exp.Type == ExpressionType.Boolean))
+            if ((exp.Type == ExpressionType.Boolean) || Stream.Position == (Stream.LastToken - 1))
             {
                 return exp;
             }
@@ -142,18 +127,17 @@ public class Parser
 
         return null;
     }
-    private Expression? ParseExpressionBoolean()
-    {
+    private Expression? ParseExpressionBoolean()                  // analogamente al parsea de expresiones aritmeticas se parsea las expresiosnes booleanas
+    {                                                             // haciendo uso de un metodo analogo y un prioridad igualmente
         return ParseExpBooleanLv1();
     }
     private Expression? ParseExpBooleanLv1()
     {
         Expression? left = ParseExpBooleanLv2();
         Expression? exp = ParseExpBooleanLv1_(left);
-        //if (Stream.FindToken(TiposDToken.CloseParentesis))
-        //{
-            exp = ParseExpBooleanLv1_(exp);
-        //}
+
+        exp = ParseExpBooleanLv1_(exp);
+
         return exp;
 
     }
@@ -185,27 +169,21 @@ public class Parser
         exp = ParseParentesis();
         if (exp != null) return exp;
 
-
         Expression? left = ParseExpressionLv1();
         exp = ParseBooleanOP(left);
         if (exp != null) return exp;
-
-
-        //exp = ParseVariableReference();
-        //if (exp != null) return exp;
 
         return null;
     }
     private Expression? ParseString()
     {
-        //var x =  Stream.CurrentToken().StringToken;
         if (Stream.IsToken(TiposDToken.StringLiteral))
         {
             return new StringLiteral(Stream.CurrentToken().StringToken.Substring(1, Stream.CurrentToken().StringToken.Length - 2), Stream.Position);
         }
         return null;
     }
-    private Expression? ParseBooleanOP(Expression? left)
+    private Expression? ParseBooleanOP(Expression? left)                 //parsea los operadores booleanos >,<,==, no sea han implemetado <=,>=, aunque su implemetacion es sencilla
     {
         if (left == null) return null;
         if (Stream.FindToken(TiposDToken.Igual))
@@ -241,7 +219,7 @@ public class Parser
         else return left;
 
     }
-    private Expression? ParseBoolean()
+    private Expression? ParseBoolean()                         //parsea la expression booleana true o false
     {
         if (Stream.IsToken(TiposDToken.Bool))
         {
@@ -249,7 +227,7 @@ public class Parser
         }
         return null;
     }
-    private Expression? ParseOR(Expression? left)
+    private Expression? ParseOR(Expression? left)                         //parsea la expression booleana |
     {
         var Or = new OpOr(Stream.Position);
         if (left == null || !Stream.FindToken(TiposDToken.Or)) return null;
@@ -260,7 +238,7 @@ public class Parser
         Or.Right = right;
         return Or;
     }
-    private Expression? ParseAnd(Expression? left)
+    private Expression? ParseAnd(Expression? left)                            //parsea la expression booleana &
     {
         var And = new OpAnd(Stream.Position);
         if (left == null || !Stream.FindToken(TiposDToken.And)) return null;
@@ -274,25 +252,13 @@ public class Parser
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-    private Expression? ParseExpressionLv1()
+    private Expression? ParseExpressionLv1()              // EXPRESIONES lV1 trata de parsear una adicion o subtraccion
     {
         Expression? newLeft = ParseExpressionLv2();
         Expression? exp = ParseExpressionLv1_(newLeft);
         //if (Stream.FindToken(TiposDToken.CloseParentesis))
-       // {
-            exp = ParseExpressionLv1_(exp);
+        // {
+        exp = ParseExpressionLv1_(exp);
         //}
         return exp;
     }
@@ -306,7 +272,7 @@ public class Parser
 
         return left;
     }
-    private Expression? ParseExpressionLv2()
+    private Expression? ParseExpressionLv2()                   // EXPRESIONES lV2 trata de parsear una multiplicacion o division
     {
         Expression? newLeft = ParseExpressionLv3();
         return ParseExpressionLv2_(newLeft);
@@ -321,7 +287,7 @@ public class Parser
 
         return left;
     }
-    private Expression? ParseExpressionLv3()
+    private Expression? ParseExpressionLv3()         // EXPRESIONES lV3 trata de parsear una potencia
     {
         Expression? newLeft = ParseExpressionLv4();
         return ParseExpressionLv3_(newLeft);
@@ -332,7 +298,7 @@ public class Parser
         if (exp != null) return exp;
         return left;
     }
-    private Expression? ParseExpressionLv4()
+    private Expression? ParseExpressionLv4()              // EXPRESIONES lV 4 son las mas prioritarias al resolver una expression
     {
         Expression? exp = ParseNumber();
         if (exp != null) return exp;
@@ -361,6 +327,10 @@ public class Parser
 
         exp = ParseParentesis();
         if (exp != null) return exp;
+
+        exp = ParseString();
+        if (exp != null) return exp;
+
         return null;
     }
 
@@ -376,7 +346,7 @@ public class Parser
         return funct;
     }
 
-    public Expression? ParseFunctionReference()
+    public Expression? ParseFunctionReference()                                  //parsea una referencia a funcion por ejemplo f(3)
     {
         if (!Stream.IsToken(TiposDToken.Identificador) || !FunctionScope.ContainsFunction(Stream.CurrentToken().StringToken)) return null;
         var identificador = Stream.CurrentToken().StringToken;
@@ -386,7 +356,7 @@ public class Parser
         return ConvertObjToExp(function.Invoke(arguments));
 
     }
-    private List<Expression> ParseArgumentsFunc()
+    private List<Expression> ParseArgumentsFunc()                      //parsea los argumentos        
     {
         var Arguments = new List<Expression>();
         int count = 1;
@@ -397,11 +367,11 @@ public class Parser
             if (!Stream.FindToken(TiposDToken.Coma)) count = 0;
 
         }
-        Stream.NextToken();//revisar
+        Stream.NextToken();
         return Arguments;
     }
 
-    private Expression? ConvertObjToExp(object? obj)
+    private Expression? ConvertObjToExp(object? obj)                              //convierte los tipo object en objetos Expressions
     {
         if (obj is bool) return new Boolean((bool)obj, Stream.Position);
         if (obj is double) return new Number((double)obj, Stream.Position);
@@ -410,27 +380,7 @@ public class Parser
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    private Expression? ParseAdd(Expression? left)
+    private Expression? ParseAdd(Expression? left)                         //parsea una substraccion con miembro izquierdo y miembro derecho
     {
         Add sum = new Add(Stream.Position);
 
@@ -448,7 +398,7 @@ public class Parser
 
         return ParseExpressionLv1_(sum);
     }
-    private Expression? ParseSub(Expression? left)
+    private Expression? ParseSub(Expression? left)                                 //parsea una substraccion con miembro izquierdo y miembro derecho
     {
         Sub sub = new Sub(Stream.Position);
 
@@ -466,7 +416,7 @@ public class Parser
 
         return ParseExpressionLv1_(sub);
     }
-    private Expression? ParseMul(Expression? left)
+    private Expression? ParseMul(Expression? left)                    //parsea una multiplicacion con miembro izquierdo y miembro derecho
     {
         Mul mul = new Mul(Stream.Position);
 
@@ -484,7 +434,7 @@ public class Parser
 
         return ParseExpressionLv2_(mul);
     }
-    private Expression? ParseDiv(Expression? left)
+    private Expression? ParseDiv(Expression? left)                                   //parsea una division con miembro izquierdo y miembro derecho
     {
         Div div = new Div(Stream.Position);
 
@@ -502,7 +452,7 @@ public class Parser
 
         return ParseExpressionLv2_(div);
     }
-    private Expression? ParsePotencia(Expression? left)
+    private Expression? ParsePotencia(Expression? left)                          //parsea la potencia
     {
         Potencia pot = new Potencia(Stream.Position);
         if (left == null || !Stream.FindToken(TiposDToken.Potencia)) return null;
@@ -518,7 +468,7 @@ public class Parser
 
         return ParseExpressionLv3_(pot);
     }
-    private Expression? ParseNumber()
+    private Expression? ParseNumber()                                       //parsea un numero o su negativo
     {
         if (Stream.IsToken(TiposDToken.Number))
         {
@@ -530,11 +480,8 @@ public class Parser
 
         }
         return null;
-        //    if (!Stream.IsToken(TiposDToken.Number)) return null;
-
-        //    return new Number(double.Parse(Stream.CurrentToken().StringToken), Stream.Position);
     }
-    private Expression? ParseParentesis()
+    private Expression? ParseParentesis()                                                 //parsea un parentesis
     {
         if (Stream.IsToken(TiposDToken.OpenParentesis))
         {
@@ -556,7 +503,7 @@ public class Parser
         }
         return null;
     }
-    private Expression? ParseCoseno()
+    private Expression? ParseCoseno()                                   //  parsea el llamado a la funcion coseno
     {
         if (Stream.IsToken(TiposDToken.Coseno))
         {
@@ -584,7 +531,7 @@ public class Parser
         }
         return null;
     }
-    private Expression? ParseSeno()
+    private Expression? ParseSeno()                       // parsea el llamado a la funcion seno
     {
         if (Stream.IsToken(TiposDToken.Seno))
         {
@@ -612,7 +559,7 @@ public class Parser
         }
         return null;
     }
-    private Expression? ParsePI()
+    private Expression? ParsePI()                          //parsea el numero PI
     {
         if (Stream.IsToken(TiposDToken.NumberPI))
         {
@@ -624,7 +571,7 @@ public class Parser
         }
         return null;
     }
-    private Expression? ParseLog()
+    private Expression? ParseLog()          //parsea un logaritmo
     {
         if (Stream.IsToken(TiposDToken.Logaritmo))
         {
@@ -653,7 +600,7 @@ public class Parser
         }
         return null;
     }
-    private Expression? ParseVariableReference()
+    private Expression? ParseVariableReference()     // parsea la referencia de una variable
     {
         if (Stream.IsToken(TiposDToken.Identificador))
         {
@@ -669,7 +616,7 @@ public class VariableScope
 {
     public Dictionary<string, object> variables = new Dictionary<string, object>();
 
-    public void AddVariable(string identifier, object value)
+    public void AddVariable(string identifier, object value)  // añade las variables al diccionario
     {
         if (!variables.ContainsKey(identifier))
         {
@@ -682,13 +629,7 @@ public class VariableScope
     {
         variables[identifier] = value;
     }
-
-    public void ClearVariables()
-    {
-        variables.Clear();
-    }
-
-    public object GetVariableValue(string identifier)
+    public object GetVariableValue(string identifier) //obtiene la variable si esta definida
     {
         if (variables.ContainsKey(identifier))
         {
@@ -696,24 +637,24 @@ public class VariableScope
         }
         else
         {
-            throw new Exception($"Semantic error: Variable '{identifier}' does not exist.");///ver
+            throw new Exception($"! SEMANTIC ERROR : Variable '{identifier}' does not exist.");
         }
     }
 
-    public bool ContainsVariable(string identifier)
+    public bool ContainsVariable(string identifier) // dice si el diccionario contiene la variable
     {
         return variables.ContainsKey(identifier);
     }
 }
 
-public class FunctionVariableScope
+public class FunctionVariableScope  // esta clase representa un stack<variableScope> donde se guardan los valores de las funciones que se ejecutan
 {
     public static Stack<VariableScope> variables = new Stack<VariableScope>();
     // public static VariableScope variables = new VariableScope();
     public static int CountOverFlow { get; set; }
-    public static void AddVariable(string identifier, object value)
-    {
-        if (CountOverFlow > 1000)
+    public static void AddVariable(string identifier, object value) // este metodo verifica si para una variable existe un valor en un diccionario
+    {                                                               // si no existe lo agrega en ese diccionario y si existe crea uno nuevo, agrega el valor y lo 
+        if (CountOverFlow > 1000)                                   // pone en el stack<>
         {
             throw new Exception("!OVERFLOW ERROR : Hulk Stack overflow");
         }
@@ -732,13 +673,8 @@ public class FunctionVariableScope
         // variables.variables[identifier] = value;
     }
 
-   
-
     public static bool ContainsVariable(string identifier)
     {
         return variables.Peek().ContainsVariable(identifier);
     }
 }
-
-
-
